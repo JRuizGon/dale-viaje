@@ -225,7 +225,18 @@ function navigateTo(viewId) {
         '/ciudades-creativas': 'view-sites',
         '/galeria': 'view-gallery',
         '/ia-guia': 'view-ia',
-        '/registro': 'view-auth'
+        '/registro': 'view-auth',
+        '/esteli': 'view-esteli',
+        '/leon': 'view-leon',
+        '/nagarote': 'view-nagarote',
+        '/managua': 'view-managua',
+        '/masaya': 'view-masaya',
+        '/granada': 'view-granada',
+        '/sanjuan': 'view-sanjuan',
+        '/juigalpa': 'view-juigalpa',
+        '/matagalpa': 'view-matagalpa',
+        '/bluefields': 'view-bluefields'
+        
     };
 
     const targetId = idMap[viewId] || 'view-404';
