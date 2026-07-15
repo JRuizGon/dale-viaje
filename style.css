@@ -1,0 +1,1784 @@
+/* ==========================================================================
+   VARIABLES Y CONFIGURACIÓN BASE
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+    /* Paleta de Azul Oscuro Profundo y Contrastes */
+    --bg-dark-main: #0b1329;       /* Azul oscuro profundo para el fondo general */
+    --bg-dark-card: #1c2541;       /* Azul intermedio para tarjetas y secciones */
+    --primary: #3a86ff;            /* Azul brillante para elementos activos */
+    --primary-dark: #00b4d8;
+    --amber: #ffb703;              /* Oro pinolero para acentos importantes */
+    --success: #2ec4b6;
+    --red: #e63946;
+    --text-light: #f8fafc;         /* Blanco hueso para lectura suave */
+    --text-muted: #94a3b8;         /* Gris azulado para textos secundarios */
+    --white: #ffffff;
+    --borde-colonial: rgba(255, 255, 255, 0.1); /* Definición preventiva del borde */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Aplicación de la nueva tipografía global */
+    font-family: 'Poppins', sans-serif; 
+}
+
+body {
+    background-color: var(--bg-dark-main);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+h1, h2, h3, h4 {
+    font-weight: 800;              /* Súper negrilla para títulos impactantes */
+    letter-spacing: -0.5px;
+    color: var(--white);
+}
+
+p {
+    font-weight: 400;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* Textura sutil inspirada en diseños Mesoamericanos de fondo */
+.textura-patria {
+    background-image: radial-gradient(var(--text-muted) 0.5px, transparent 0.5px), 
+                      radial-gradient(var(--text-muted) 0.5px, var(--bg-dark-main) 0.5px);
+    background-size: 40px 40px;
+    background-position: 0 0, 20px 20px;
+}
+
+/* ==========================================================================
+   4. ESTILOS DEL SPLASH SCREEN (SISTEMA DE ANIMACIÓN ORIGINAL + BANNER HISTÓRICO)
+   ========================================================================== */
+#splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #091624; /* Fondo oscuro base para dar profundidad tras el banner */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+    overflow: hidden;
+}
+
+/* El truco: Capa de fondo independiente con Opacidad para el Banner */
+#splash-screen::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: url('img/banner-splash.png') center/cover no-repeat;
+    opacity: 0.25; /* Modificá este valor (0.1 a 0.9) para darle más o menos transparencia al banner */
+    z-index: 1;
+}
+
+/* CAPA DE SUPERPOSICIÓN: Degradado para fijar un fuerte contraste con las letras */
+.splash-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, 
+                rgba(9, 22, 36, 0.5) 0%, 
+                rgba(255, 255, 255, 0.02) 50%, 
+                rgba(9, 22, 36, 0.65) 100%);
+    z-index: 2;
+}
+
+/* Contenedor del Logo (Z-INDEX SUPERIOR) */
+.logo-container {
+    position: relative;
+    width: 550px;
+    height: 650px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 3; /* Salta al frente de las texturas de fondo */
+}
+
+/* Estilo para el mapa base que está en el centro de la pantalla */
+.mapa-base-splash {
+    width: 280px;
+    height: auto;
+    opacity: 1; /* El mapa del centro sí se ve bastante claro */
+    display: flex;
+    margin: 0 auto;
+}
+
+.mapa {
+    width: 100%;
+    height: auto;
+    z-index: 1;
+    margin-top: -50px;
+    border-radius: 2rem;
+    padding: 1rem;
+}
+
+.loader {
+    position: fixed;
+    bottom: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top: 4px solid var(--primary-dark);
+    border-radius: 50%;
+    animation: girarLoader 0.8s linear infinite;
+    z-index: 4;
+}
+
+@keyframes girarLoader {
+    0% { transform: translateX(-50%) rotate(0deg); }
+    100% { transform: translateX(-50%) rotate(360deg); }
+}
+
+.guardabarranco-container {
+    position: absolute;
+    width: 190px;
+    height: 190px;
+    z-index: 4; /* Por encima de los mapas y del banner */
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: viajeGuardabarranco 2.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation-delay: 0.5s;
+    pointer-events: none;
+}
+
+.guardabarranco-animado {
+    width: 100%;
+    height: 100%;
+    background-image: url('img/guardabarranco-sprite.png');
+    background-repeat: no-repeat;
+    background-position: 0px center;
+    background-size: 760px 190px;
+    animation: aleteoReal 0.4s steps(4) infinite;
+}
+
+@keyframes aleteoReal {
+    from { background-position: 0px center; }
+    to { background-position: -718px center; }
+}
+
+@keyframes viajeGuardabarranco {
+    0% { transform: translate(-700px, 500px) rotate(-15deg) scale(0.3); opacity: 0; }
+    15% { opacity: 1; filter: drop-shadow(0 0 20px var(--success)); }
+    45% { transform: translate(-50px, 20px) rotate(-25deg) scale(1.2); }
+    85% { opacity: 1; }
+    100% { transform: translate(800px, -600px) rotate(-30deg) scale(0.5); opacity: 0; }
+}
+
+/* Pines actuales integrados armónicamente en tu estructura */
+.pin {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    z-index: 5; /* Asegura visualización completa sobre el vidrio del mapa */
+    transform: scale(0);
+    opacity: 0;
+    animation: brotarPin 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.pin svg { 
+    filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5)); 
+}
+
+/* Conservando colores distintivos aplicados a tus delays */
+.pin-1 { top: 38%; left: 40%; fill: var(--primary); animation-delay: 1.5s; }
+.pin-2 { top: 56%; left: 48%; fill: var(--amber); animation-delay: 1.8s; }
+.pin-3 { top: 30%; left: 57%; fill: var(--success); animation-delay: 2.1s; }
+.pin-4 { top: 39%; left: 50%; fill: var(--primary-dark); animation-delay: 2.4s; }
+
+@keyframes brotarPin {
+    0% { transform: scale(2.2); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.logo-texto {
+    position: absolute;
+    bottom: 40px;
+    text-align: center;
+    width: 100%;
+    z-index: 5;
+}
+
+.logo-texto h2 { 
+    color: var(--white); /* Cambiado a blanco para romper con el fondo y brillar con fuerza */
+    font-size: 44px; 
+    margin: 0; 
+    letter-spacing: 4px; 
+    font-weight: 900; 
+    text-shadow: 0 4px 10px rgba(255, 255, 255, 0.85), 0 0 15px rgba(0,70,184,0.5); 
+}
+
+.logo-texto p { 
+    color: var(--amber); /* Cambiado a oro artesanal para mejorar contraste contra el banner */
+    font-size: 15px; 
+    margin-top: 6px; 
+    font-weight: 700; 
+    letter-spacing: 1.5px; 
+    text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+}
+
+/* Contenedor principal invisible durante el Splash */
+#main-content {
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: opacity 0.5s ease-in-out;
+}
+
+/* ==========================================================================
+   ESTRUCTURA DE NAVEGACIÓN Y NAVBAR (CORREGIDA)
+   ========================================================================== */
+.navbar {
+    background-color: var(--bg-dark-card);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    padding: 0.5rem 2rem;
+    position: sticky;
+    top: 0; 
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+ 
+}
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    height: 4.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Ajuste para el logo verdadero en la Navbar */
+.logo-app-img {
+    height: 80px;        /* Altura balanceada para no desbordar */
+    width: auto; 
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.nav-logo {
+    font-weight: 900;             /* Ultra negrilla para la marca */
+    color: var(--white);
+    letter-spacing: 1px;
+}
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    font-weight: 600;             /* Enlaces del menú más firmes y legibles */
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--amber);          /* Resaltado en amarillo oro */
+}
+
+.nav-btn-account {
+    background-color: rgba(58, 134, 255, 0.08);
+    color: var(--primary) !important;
+    border: 2px solid var(--primary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.nav-btn-account:hover {
+    background-color: var(--primary) !important;
+    color: var(--white) !important;
+}
+
+
+main {
+    padding-top: 1rem;
+}
+
+/* Corrección tipográfica global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Plus Jakarta Sans', sans-serif; 
+}
+
+/* Gestión de vistas (Sin duplicados) */
+.view {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.view.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Asegurar que el contenido principal tenga el layout correcto */
+#main-content {
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.container-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+.title-header {
+    margin-bottom: 2.5rem;
+    border-bottom: 1px dashed var(--borde-colonial);
+    padding-bottom: 1rem;
+}
+
+.title-header h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--white);
+}
+
+.title-header p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-top: 0.25rem;
+}
+
+/* ==========================================================================
+   VISTA: HOME (INICIO) - BANNER PERSONALIZADO
+   ========================================================================== */
+.hero {
+    padding: 10rem 2rem;
+    text-align: center;
+    background: linear-gradient(100deg, rgba(0, 30, 90, 0.6), rgba(22, 29, 34, 0.5)), 
+                url('img/banner-nicaragua.jpg');
+    background-size: cover;
+    background-position: center center;
+    color: var(--white);
+    border-radius: 1rem;
+    border: 2px solid var(--borde-colonial);
+    margin-bottom: 4rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-content {
+    max-width: 800px;
+    background: rgba(11, 19, 41, 0.75); /* Tono colonial oscuro legible */
+    padding: 2.5rem 3rem;
+    border-radius: 1rem;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(58, 134, 255, 0.3);
+}
+
+.hero h1 {
+    font-size: 3.8rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+    font-size: 1.3rem;
+    opacity: 0.95;
+    max-width: 600px;
+    margin: 0 auto 2rem auto;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    font-weight: 500;
+}
+
+.btn-map-start, .btn-auth, .btn-auth-secondary {
+    font-weight: 900;    
+    color: white;         /* Botones imponentes */
+    letter-spacing: 0.5px;
+    background-color: var(--primary);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-map-start:hover {
+    background-color: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+.grid-container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5rem;
+}
+
+/* TARJETAS CON TEXTURA INTEGRADA */
+.card {
+    background: var(--bg-dark-card);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(58, 134, 255, 0.15);
+}
+
+.card-header {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem;
+}
+
+.card-header h2, .card-header h3 {
+    font-weight: 800;
+}
+
+.card-body {
+    padding: 2rem;
+    background-color: var(--bg-dark-card); /* Ajustado para mantener la coherencia del Dark Mode */
+}
+
+.card-body p {
+    color: var(--text-light); /* Corregido: Texto claro sobre caja oscura */
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.card-action {
+    font-weight: 600;             /* Negrilla para los llamados a la acción */
+    color: var(--amber);
+    text-decoration: none;
+}
+
+.section-why {
+    background: rgba(28, 37, 65, 0.5);
+    border-radius: 16px;
+    padding: 3rem 2rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.section-why h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--amber);          /* Título llamativo */
+}
+
+.section-why p {
+    font-style: italic;
+    font-weight: 600;             /* Texto destacado en negrilla suave */
+    color: #cbd5e1;
+}
+
+/* ==========================================================================
+   VISTA: MAPA INTERACTIVO
+   ========================================================================== */
+.map-interactive-wrapper {
+    position: relative;
+    background-color: rgba(11, 19, 41, 0.5);
+    border: 2px solid var(--primary);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    overflow: hidden;
+}
+.map-interactive-wrapper path{
+    fill:#1100ff;
+    stroke: #0b1329;
+    stroke-width: 3px;
+}
+
+.map-interactive-wrapper :hover{
+    fill: #00b4d8;
+}
+
+.mapa-navegacion {
+    max-width: 100%;
+    height: 550px;
+    object-fit: contain;
+    opacity: 0.9;
+}
+
+.pin-tag-name {
+    text-align: end;
+    background-color: var(--bg-dark-main);
+    color: var(--white);
+    padding: 0.35rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+    white-space: nowrap;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* ==========================================================================
+   VISTA: SECCIÓN UNIFICADA CIUDADES CREATIVAS & FILTROS
+   ========================================================================== */
+.creative-controls {
+    background: var(--bg-dark-card);
+    border: 1px solid var(--borde-colonial);
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .creative-controls {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.select-box label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.select-box select {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 0.35rem;
+    border: 2px solid var(--primary);
+    background-color: var(--bg-dark-main);
+    font-weight: 600;
+    color: var(--white); /* Corregido para visualización legible */
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tab-filter {
+    padding: 0.6rem 1.2rem;
+    border: 1px solid var(--borde-colonial);
+    background: var(--bg-dark-main);
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.tab-filter:hover {
+    background: var(--bg-dark-card);
+    color: var(--white);
+}
+
+.tab-filter.active {
+    background: var(--primary);
+    color: var(--white);
+    border-color: var(--primary);
+}
+
+/* Grid de Destinos Internos */
+.creative-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+@media (min-width: 768px) {
+    .creative-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* Tarjetas de Sitios individuales */
+.site-card {
+    background-color: var(--bg-dark-card);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    border: 1px solid var(--borde-colonial);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.site-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(58, 134, 255, 0.15);
+}
+
+.site-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+}
+
+.site-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.site-meta .rating {
+    color: var(--amber);
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+}
+
+.site-meta .visitors {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+}
+
+.site-desc {
+    color: var(--text-light);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
+}
+
+.highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.tag {
+    background-color: var(--bg-dark-main);
+    color: var(--text-light);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.3rem 0.6rem;
+    border-radius: 0.25rem;
+}
+
+/* Variaciones Visuales por Categoría */
+.border-turistico { border-left: 6px solid #10b981 !important; }
+.border-colonial { border-left: 6px solid #3a86ff !important; }
+.border-historico { border-left: 6px solid #f59e0b !important; }
+.border-artesania { border-left: 6px solid #8b5cf6 !important; }
+
+.badge-cat {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    background: var(--bg-dark-main);
+    color: var(--amber);
+    border-radius: 0.25rem;
+    float: right;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.no-data-alert {
+    grid-column: 1 / -1;
+    text-align: center;
+    background: var(--bg-dark-card);
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 2.5rem;
+    border-radius: 0.5rem;
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+/* ==========================================================================
+   VISTA: GALERÍA COLECTIVA (ESTILO PREMIUM INMERSIVO)
+   ========================================================================== */
+.gallery-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    padding: 0 10px;
+}
+
+.btn-open-upload {
+    background-color: var(--primary, #3b82f6);
+    color: #ffffff;
+    border: none;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px; /* Botón completamente redondeado más moderno */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-open-upload:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Reemplaza tanto .gallery-grid como #gallery-render-container con este único contenedor limpio */
+#gallery-render-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem 10px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* --- NUEVA TARJETA CINEMÁTICA --- */
+.gallery-card {
+    position: relative;
+    background: #0f172a; 
+    border-radius: 20px; /* Bordes más curvos y orgánicos */
+    overflow: hidden;
+    aspect-ratio: 1 / 1; /* Tarjeta completamente cuadrada simétrica */
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+/* Contenedor multimedia que ocupa el 100% de la tarjeta */
+.card-image-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.card-media {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --- CAPA OSCURA INFERIOR PARA LEGIBILIDAD DEL TEXTO --- */
+.card-image-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 40%,
+        rgba(15, 23, 42, 0.4) 65%,
+        rgba(15, 23, 42, 0.95) 100%
+    );
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* --- TEXTO FLOTANTE SOBRE EL MULTIMEDIA --- */
+.card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.5rem;
+    z-index: 2; /* Por encima del degradado negro */
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    box-sizing: border-box;
+}
+
+.card-content h3 {
+    color: #ffffff;
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: -0.5px;
+}
+
+.card-content p {
+    color: #cbd5e1; /* Gris claro de alta legibilidad */
+    font-size: 0.88rem;
+    line-height: 1.4;
+    margin: 0;
+    display: -webkit-box;
+    -webkitline-clamp: 2; /* Corta el texto largo automáticamente a 2 líneas */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* --- PIE DE FOTO (AUTOR) --- */
+.card-footer {
+    margin-top: 0.4rem;
+    display: flex;
+    align-items: center;
+}
+
+.explorer-tag {
+    color: #3b82f6; /* Destaca el tag en azul eléctrico */
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(59, 130, 246, 0.1);
+    padding: 3px 10px;
+    border-radius: 50px;
+}
+
+.explorer-tag i {
+    width: 12px;
+    height: 12px;
+}
+
+/* --- HOVER EFFECTS (EFECTOS DE ENFOQUE) --- */
+.gallery-card:hover {
+    transform: scale(1.03) translateY(-4px);
+}
+
+.gallery-card:hover .card-media {
+    transform: scale(1.06); /* Zoom inmersivo lento hacia el fondo */
+}
+
+/* Quitamos el badge flotante molesto ya que la ubicación se lee integrada abajo */
+.card-badge {
+    display: none;
+}
+
+/* Vistas */
+.view { display: none; }
+.view.active { display: block; }
+
+/* Alerta cuando la tabla de dale_viaje.db está vacía */
+.no-data-alert {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #111827;
+    border: 2px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    color: #64748b;
+    font-size: 1rem;
+}
+
+/* ==========================================================================
+   MODAL DE BITÁCORA: SUPERPOSICIÓN Y EFECTO BLUR
+   ========================================================================== */
+
+/* Contenedor del fondo que cubre toda la pantalla */
+#upload-modal {
+    position: fixed;
+    inset: 0; /* Cubre arriba, abajo, izquierda y derecha */
+    background-color: rgba(15, 23, 42, 0.7); /* Capa oscura translúcida */
+    backdrop-filter: blur(8px); /* ¡El efecto de desenfoque premium para el fondo! */
+    -webkit-backdrop-filter: blur(8px); /* Soporte para Safari */
+    display: none; /* Se controla desde JS (flex cuando está activo) */
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; /* Asegura que se monte sobre el menú y todo lo demás */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* La tarjeta flotante del formulario */
+.modal-content {
+    background: #151f32; /* Tono azul oscuro integrado */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    width: 100%;
+    max-width: 480px;
+    border-radius: 24px;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    animation: modalEntrada 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    box-sizing: border-box;
+}
+
+/* Animación de escala sutil al abrir */
+@keyframes modalEntrada {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Botón de cerrar (X) en la esquina superior derecha */
+.btn-close-modal {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #94a3b8;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+    background: rgba(239, 68, 68, 0.2); /* Rojo sutil al pasar el mouse */
+    color: #ef4444;
+}
+
+/* Título del formulario */
+.modal-content h2 {
+    color: #ffffff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 1.75rem;
+    letter-spacing: -0.5px;
+}
+
+/* --- ESTRUCTURA INMUTABLE DE LOS CAMPOS (INPUT GROUPS) --- */
+.modal-content .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.modal-content .input-group label {
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Contenedor wrapper para alinear el ícono y el input en la misma línea */
+.modal-content .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+/* Iconos integrados dentro del campo de texto */
+.modal-content .input-wrapper i {
+    position: absolute;
+    left: 14px;
+    color: #64748b;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+}
+
+/* Estilo unificado para cajas de texto y textareas */
+.modal-content input[type="text"],
+.modal-content .custom-textarea {
+    width: 100%;
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 0.75rem 1rem 0.75rem 2.75rem; /* Margen izquierdo extra para que el texto no toque el ícono */
+    color: #ffffff;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* Ajuste específico para el área de comentarios (sin ícono izquierdo) */
+.modal-content .custom-textarea {
+    padding: 0.75rem 1rem; 
+    resize: none; /* Evita que el usuario estire la caja y rompa el diseño */
+    font-family: inherit;
+}
+
+.modal-content input:focus,
+.modal-content .custom-textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Estilo estético para el botón de subir archivos del dispositivo */
+.modal-content input[type="file"] {
+    width: 100%;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    background: #0f172a;
+    padding: 0.5rem;
+    border-radius: 12px;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+/* Estilo del botón de enviar */
+.modal-content .btn-auth {
+    width: 100%;
+    background: #3b82f6;
+    color: #ffffff;
+    border: none;
+    padding: 0.85rem;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.modal-content .btn-auth:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+}
+
+.modal-content .btn-auth:disabled {
+    background: #475569;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   INTERACCIONES EN TARJETAS (LIKES, COMENTARIOS, GUARDAR)
+   ========================================================================== */
+.card-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-top: auto; /* Empuja los botones hacia la parte inferior del texto */
+    padding-top: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.action-btn {
+    background: none;
+    border: none;
+    color: #94a3b8; /* Gris pizarra suave por defecto */
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.action-btn i {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Efectos individuales al pasar el cursor (Hover) */
+.like-btn:hover {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.comment-btn:hover {
+    color: #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.save-btn:hover {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.08);
+}
+
+/* Animación de pulsación al hacer clic */
+.action-btn:active i {
+    transform: scale(0.8);
+}
+
+/* Botón especial para empujar el botón de guardar hacia el extremo derecho */
+.save-btn {
+    margin-left: auto; 
+}
+
+/* Estado activo de las etiquetas numéricas */
+.action-btn.active .count-label {
+    color: #ffffff;
+}
+/* ==========================================================================
+   VISTA: GUÍA DE INTELIGENCIA ARTIFICIAL (CHAT)
+   ========================================================================== */
+.ia-bg {
+    background: radial-gradient(circle at top right, rgba(58, 134, 255, 0.05), transparent);
+}
+
+.ia-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+}
+
+.ia-header-icon {
+    width: 4.5rem;
+    height: 4.5rem;
+    background-color: var(--primary);
+    color: var(--white);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 20px rgba(58, 134, 255, 0.3);
+}
+
+.quick-questions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+@media (min-width: 640px) { .quick-questions { grid-template-columns: repeat(2, 1fr); } }
+
+.btn-quick {
+    background-color: var(--bg-dark-card);
+    border: 1px solid var(--borde-colonial);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-quick:hover {
+    border-color: var(--primary);
+    background-color: var(--bg-dark-main);
+    transform: translateY(-1px);
+}
+
+.chat-box {
+    background-color: var(--bg-dark-card);
+    border: 1px solid var(--borde-colonial);
+    border-radius: 0.5rem;
+    height: 480px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    background-color: var(--bg-dark-main);
+}
+
+.message {
+    max-width: 80%;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.message.user {
+    background-color: var(--primary);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+}
+
+.message.ai {
+    background-color: #060079; /* Legibilidad total en el contenedor interno */
+    border: 1px solid var(--primary);
+    color: white;
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+}
+
+.chat-input-area {
+    padding: 1rem;
+    border-top: 1px solid var(--borde-colonial);
+    display: flex;
+    gap: 0.75rem;
+    background-color: var(--bg-dark-card);
+}
+
+/* ==========================================================================
+   VISTA: REGISTRO / AUTENTICACIÓN / MI PERFIL
+   ========================================================================== */
+/* Container Principal del Perfil */
+#auth-profile-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #0f172a; /* Fondo oscuro integrado con tu theme */
+    border-radius: 16px;
+    border: 1px solid #1e293b;
+    text-align: center;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Área Interactiva del Avatar */
+.avatar-upload-wrapper {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 2rem auto;
+    cursor: pointer;
+}
+
+#profile-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid #3b82f6; /* Borde azul brillante */
+    background: #1e293b;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+/* Efecto Hover para indicar que se puede cambiar la foto */
+.avatar-upload-wrapper:hover #profile-avatar-img {
+    transform: scale(1.03);
+    filter: brightness(0.7);
+}
+
+.avatar-upload-wrapper::after {
+    content: '📸 Cambiar Foto';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.avatar-upload-wrapper:hover::after {
+    opacity: 1;
+}
+
+/* Ocultar el input por defecto de HTML de forma elegante */
+.hidden-file-input {
+    display: none !important;
+}
+
+/* Campos de datos del perfil (Estilo Filas de Tabla Limpias) */
+.profile-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    text-align: left;
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: #1e293b;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+
+.profile-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: #94a3b8;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.profile-value {
+    font-weight: 600;
+    color: #f8fafc;
+}
+
+/* Inputs en modo edición */
+.profile-input-edit {
+    background: #0f172a;
+    border: 1px solid #3b82f6;
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    outline: none;
+    text-align: right;
+    width: 60%;
+}
+
+/* Contenedor de Botones de Acción */
+.profile-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.btn-profile-edit {
+    flex: 2;
+    background: var(--bg-dark-main);
+    color: var(--bg-dark-main);
+    border: none;
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-profile-edit:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 180, 216, 0.4);
+}
+
+.btn-profile-logout {
+    flex: 1;
+    background: rgba(230, 57, 70, 0.1);
+    color: var(--red);
+    border: 1px solid rgba(230, 57, 70, 0.2);
+    padding: 1rem;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-profile-logout:hover {
+    background: var(--red);
+    color: var(--bg-dark-main);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4);
+}
+
+.auth-box-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+@media (min-width: 768px) { .auth-box-layout { grid-template-columns: repeat(2, 1fr); } }
+
+.auth-card-panel {
+    background: var(--bg-dark-card); /* Ajustado: Cambiado de un 'blue' sólido para no romper el ecosistema visual */
+    padding: 2.5rem 2rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--borde-colonial);
+}
+.border-left-blue { border-left: 6px solid var(--primary) !important; }
+.border-left-amber { border-left: 6px solid var(--amber) !important; }
+
+.input-wrapper input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid var(--borde-colonial);
+    background-color: var(--bg-dark-main);
+    color: var(--white);
+    border-radius: 0.35rem;
+    outline: none;
+    font-size: 0.95rem;
+}
+
+.btn-auth-secondary {
+    width: 100%;
+    background: linear-gradient(135deg, #f59e0b, #b45309);
+    color: var(--bg-dark-main);
+    border: none;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 3px solid #78350f;
+    transition: all 0.2s;
+}
+
+/* MODALES Y ADICIONALES */
+.modal-card {
+    background-color: var(--bg-dark-card);
+    border-radius: 0.5rem;
+    border: 1px solid var(--borde-colonial);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    width: 100%;
+    max-width: 550px;
+    padding: 2rem;
+}
+
+.hidden { display: none !important; }
+
+/* ==========================================================================
+   KEYFRAMES ADICIONALES DE LA APLICACIÓN
+   ========================================================================== */
+@keyframes fadeInView { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes pinPulseEffect { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+/* Asegurar que todas las secciones estén ocultas por defecto */
+.view {
+    display: none;
+}
+
+/* Solo mostrar la sección que tenga la clase 'active' */
+.view.active {
+    display: block;
+}
+
+/* Opcional: suavizar la aparición */
+.view {
+    animation: fadeIn 0.3s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+/* ==========================================================================
+   COMPONENTE: NOTIFICACIONES TOAST DINÁMICAS
+   ========================================================================== */
+#toast-container {
+    position: center;
+    top: 24px;
+    left: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10000; /* Por encima del modal incluso */
+    pointer-events: none; /* No interrumpe los clics en la app */
+}
+
+.toast-card {
+    pointer-events: auto; /* Permite interactuar con la tarjeta si es necesario */
+    background: #1e293b; /* Fondo pizarra oscuro */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 500;
+    min-width: 300px;
+    max-width: 400px;
+    
+    /* Animación de entrada por deslizamiento lateral */
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transition: all 0.3s ease;
+}
+
+/* Variación según el tipo de mensaje */
+.toast-card.success {
+    border-left: 4px solid #10b981; /* Verde esmeralda para éxitos */
+}
+
+.toast-card.error {
+    border-left: 4px solid #ef4444; /* Rojo para fallos */
+}
+
+/* Iconos o emojis decorativos dentro de la notificación */
+.toast-icon {
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Animación de desaparición progresiva (controlada por JS) */
+.toast-card.fade-out {
+    opacity: 0;
+    transform: translateX(100px) scale(0.9);
+}
+
+@keyframes toastIn {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Asegura que el contenedor de Leaflet tenga dimensiones */
+#leaflet-map {
+  height: 500px;
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  margin-top: 15px;
+}
+
+.map-detail-section {
+  padding: 40px 20px;
+  background: #f8f9fa;
+  border-top: 2px solid #e9ecef;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.dept-trigger {
+  cursor: pointer;
+  transition: fill 0.2s ease;
+}
+
+/* Efecto hover para que el usuario sepa que es interactivo */
+.dept-trigger:hover {
+  fill: #2b78e4 !important; 
+}
+
+/* Apartado de Ciudades */
+
+.ciudades-style {
+    text-align: center;
+    width: 1700px;
+    background: url('img/banner-nicaragua.jpg');
+    background-size: cover;
+    color: var(--white);
+    display: flex;
+    padding-bottom: 0;
+}
+
+.esteli-style {
+    width: 100%;
+    height: auto;
+    background: rgba(25, 33, 62, 0.386); /* Tono colonial oscuro legible */
+    background-size: 100%;
+    border-radius: 0%;
+    border: 1px solid rgba(58, 133, 255, 0);
+}
+
+.ciudades-style h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+    text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
+    padding-top: 50px;
+    color: var(--amber); 
+    text-transform: uppercase; 
+}
+
+.ciudades-style  p {
+    font-size: 1.6rem;
+    opacity: 0.95;
+    margin: 0 auto 2rem auto;
+    text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+/* Contenedor de ciudades */
+
+#contenedor-ciudades{
+     padding: 20px;
+    background: linear-gradient(100deg, rgba(0, 30, 90, 0.6), rgba(22, 29, 34, 0.5));
+    color: var(--white);
+    border-radius: 1rem;
+    border: 2px solid var(--borde-colonial);
+    margin-bottom: 5px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: flow-root;
+    width: 1700px;
+    height: auto;
+}
+
+
+/* Carrusel  */
+
+.carrusel{
+width: 380px;
+height: auto;
+margin: 50px auto 0;
+overflow: hidden;
+float: left;
+align-items: center;
+padding-top: 80px;
+
+
+}
+
+.carrusel ul{
+    display: flex;
+    padding: 0;
+    width: 500%;
+    animation: slide 30s infinite alternate ease-in-out;
+}
+
+.carrusel li {
+    width: 100%;
+    list-style: none;
+    position: relative;
+
+}
+
+.carrusel h3{
+    font-size: 22px;
+    color: var(--amber);
+    text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
+}
+
+.text-carrusel h3 {
+    font-size: 20px;
+    margin-bottom: 35px;
+    color: rgb(255, 255, 255);
+    text-shadow: none;
+}
+
+.carrusel img {
+    width: 100%;
+}
+
+@keyframes slide {
+    0% { margin-left: 0;}
+    20% { margin-left: 0;}
+
+    25% { margin-left: -100%;}
+    45% { margin-left: -100%;}
+
+    50% { margin-left: -200%;}
+    70% { margin-left: -200%;}
+
+    75% { margin-left: -300%;}
+    100% { margin-left: -300%;}
+}
+
+/* Mapa de ciudades */
+
+.mapa-ciudades{
+    width: fit-content ;
+    height: fit-content;
+    margin: 0 auto;
+    padding-top: 0px;
+    padding-bottom: 100px;
+    align-items: center;
+    background-color: rgba(8, 8, 138, 0.514);
+    background-position: 20px;
+    border-color: white;
+    border-radius: 8px;
+
+}
+
+.top h1{
+    font-size: 30px;
+    font-weight: 800;
+    padding-bottom: 0px;
+    padding-top: 8px;
+}
+/* ==========================================================================
+   COMPONENTE: FOOTER INSTITUCIONAL
+   ========================================================================== */
+.main-footer {
+    width: 100%;
+    background-color: #0f172a; /* Fondo ultra oscuro que combina con la app */
+    border-top: 1px solid rgba(255, 255, 255, 0.05); /* Línea divisoria sutil */
+    padding: 2.5rem 1rem;
+    margin-top: 4rem; /* Despega el footer del contenido de la galería */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
+    width: 1700px;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem; /* Separación limpia entre líneas */
+}
+
+.footer-title {
+    color: #94a3b8; /* Gris suave elegante */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: 0.5px;
+    align-items: center;
+}
+
+.footer-subtitle {
+    color: #3b82f6; /* El azul eléctrico de tu botón principal */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800; /* Letra imponente y gruesa */
+    margin: 0;
+    letter-spacing: 4px; /* Espaciado expandido estilo marca premium */
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.2); /* Sutil destello de luz azul */
+    align-items: center ;
+}
