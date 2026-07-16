@@ -1614,7 +1614,7 @@ main {
     padding-bottom: 0;
 }
 
-.esteli-style {
+.style {
     width: 100%;
     height: auto;
     background: rgba(25, 33, 62, 0.386); /* Tono colonial oscuro legible */
@@ -1655,20 +1655,23 @@ main {
     display: flow-root;
     width: 1700px;
     height: auto;
+    overflow: hidden;
+    position: sticky;
+    top: 0; 
+    z-index: 100;
 }
 
 
 /* Carrusel  */
 
 .carrusel{
-width: 380px;
-height: auto;
+width: 400px;
+height: 400px;
 margin: 50px auto 0;
 overflow: hidden;
 float: left;
 align-items: center;
 padding-top: 80px;
-
 
 }
 
@@ -1715,6 +1718,14 @@ padding-top: 80px;
 
     75% { margin-left: -300%;}
     100% { margin-left: -300%;}
+}
+
+.view {
+    display: none;
+}
+
+.view.active {
+    display: block;
 }
 
 /* Mapa de ciudades */

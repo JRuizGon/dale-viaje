@@ -251,6 +251,21 @@ function navigateTo(viewId) {
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
+const params = new URLSearchParams(window.location.search);
+const ciudad = params.get("ciudad");
+
+document.querySelectorAll(".view").forEach(vista=>{
+    vista.classList.remove("active");
+});
+
+if(ciudad){
+    const vista=document.getElementById("view-"+ciudad);
+
+    if(vista){
+        vista.classList.add("active");
+    }
+}
+
 /* --- INTERFAZ FILTRADORA DE CIUDADES CREATIVAS --- */
 function changeCategoryFilter(category) {
     currentCategoryFilter = category;
