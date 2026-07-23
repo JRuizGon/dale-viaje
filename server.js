@@ -12,7 +12,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Inicialización de la Base de Datos SQLite
-const dbPath = path.resolve(__dirname, 'ruta505.db');
+const dbPath = path.resolve(__dirname, 'frontend', 'ruta505.db');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Error al abrir la base de datos:', err.message);
@@ -24,7 +24,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 // Crear tablas si no existen
 function crearTablas() {
-    // Tabla de Usuarios (Añadido campo avatar y city)
+    // Tabla de Usuarios (Añadido campo avatar y ciudad)
     db.run(`
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
