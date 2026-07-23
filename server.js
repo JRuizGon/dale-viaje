@@ -10,9 +10,10 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(express.static(path.join(__dirname, "frontend")));
 
 // Inicialización de la Base de Datos SQLite
-const dbPath = path.resolve(__dirname, 'frontend', 'ruta505.db');
+const dbPath = path.resolve(__dirname, 'ruta505.db');
 const db = new sqlite3.Database(dbPath, (err) => {
     if (err) {
         console.error('Error al abrir la base de datos:', err.message);
