@@ -32,6 +32,9 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 h1, h2, h3, h4 {
     font-weight: 800;              /* Súper negrilla para títulos impactantes */
@@ -352,6 +355,7 @@ main {
     flex-direction: column;
     min-height: 100vh;
     transition: opacity 0.5s ease-in-out;
+    
 }
 
 .container-content {
@@ -370,6 +374,13 @@ main {
     font-size: 2.5rem;
     font-weight: 800;
     color: var(--white);
+}
+
+.title-header h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--amber);
+    text-shadow: 0 2px 5px rgb(251, 251, 252)
 }
 
 .title-header p {
@@ -518,7 +529,8 @@ main {
 /* ==========================================================================
    VISTA: MAPA INTERACTIVO
    ========================================================================== */
-.map-interactive-wrapper {
+
+   .map-interactive-wrapper {
     position: relative;
     background-color: rgba(11, 19, 41, 0.5);
     border: 2px solid var(--primary);
@@ -529,6 +541,9 @@ main {
     align-items: center;
     box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     overflow: hidden;
+    margin-top: 70px;
+    width: 600px;
+    height: 600px;
 }
 .map-interactive-wrapper path{
     fill:#1100ff;
@@ -540,24 +555,88 @@ main {
     fill: #00b4d8;
 }
 
-.mapa-navegacion {
-    max-width: 100%;
-    height: 550px;
-    object-fit: contain;
-    opacity: 0.9;
+.text-map h2{
+    color: var(--amber);
+    text-shadow: 0 2px 5px var(--white);
+    float: right;
+    text-align: center;
+    margin-right:60px;
 }
 
-.pin-tag-name {
-    text-align: end;
-    background-color: var(--bg-dark-main);
-    color: var(--white);
-    padding: 0.35rem 0.75rem;
-    border-radius: 0.25rem;
-    font-size: 0.8rem;
-    font-weight: 700;
-    margin-top: 0.5rem;
-    white-space: nowrap;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+
+.information-box{
+    position: relative;
+    background-color: rgba(11, 19, 41, 0.5);
+    border: 2px solid var(--primary);
+    border-radius: 0.5rem;
+    padding: 2rem;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    overflow: hidden;
+    float: left;
+    border-radius: 10px;
+    margin-bottom: 2.5rem;
+    margin-right: 40px;
+    margin-top: 200px;
+    padding-bottom: 1rem;
+    padding-left: 0;
+    
+}
+
+.information-box h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--amber);
+    text-shadow: 0 2px 5px rgb(251, 251, 252);
+}
+
+.information-box p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    margin-top: 0.25rem;
+    padding-left: 80px;
+}
+
+/* Contenedor principal que corta lo que sale de los bordes */
+.slider-contenedor {
+  width: 100%;        
+  position: relative;
+
+}
+
+.slider-contenedor h2{
+    text-align: center;
+    font-size: 22px;
+    color: var(--amber);
+    text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
+}
+
+/* El contenedor que agrupa todas las imágenes (originales y duplicadas) */
+.slider-track {
+  display: flex;
+  width: max-content; /* Se estira automáticamente según las imágenes */
+  animation: flujo-infinito 25s linear infinite;
+}
+
+/* Pausa la animación cuando el usuario pase el ratón por encima */
+.slider-track:hover {
+  animation-play-state: paused;
+}
+ 
+.slider-track img {
+  width: 250px;      
+  height: 150px;
+  object-fit: cover;
+  padding: 0 10px;   
+}
+
+@keyframes flujo-infinito {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%); 
+  }
 }
 
 /* ==========================================================================

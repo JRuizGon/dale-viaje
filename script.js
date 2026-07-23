@@ -867,7 +867,7 @@ window.onload = function() {
                     contenido.style.opacity = '1';
                 }
             }, 500);
-        }, 0);
+        }, 5000);
     }
     
     // Variable global para almacenar la instancia del mapa y evitar duplicados
