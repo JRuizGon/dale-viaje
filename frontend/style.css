@@ -8,8 +8,16 @@
     --celeste-oscuro: #0c6196;
     --amarillo: #FBBF24;              
     --cian-vivido: #009695;
+    --azul-oscuro: #011585;      /* Azul oscuro profundo para el fondo general */
+    --bg-dark-card: #ffffff;     /* Color prueba */
+    --celeste: #139DF0;            /* Celeste para elementos activos */
+    --celeste-oscuro: #0c6196;
+    --amarillo: #FBBF24;              
+    --cian-vivido: #009695;
     --red: #e63946;
     --text-light: #f8fafc;         /* Blanco hueso para lectura suave */
+    --Gris: #A6A6A6;         
+    --blanco: #ffffff;
     --Gris: #A6A6A6;         
     --blanco: #ffffff;
     --borde-colonial: rgba(255, 255, 255, 0.1); /* Definición preventiva del borde */
@@ -25,6 +33,7 @@
 
 body {
     background-color: var(--azul-oscuro);
+    background-color: var(--azul-oscuro);
     color: var(--text-light);
     min-height: 100vh;
     display: flex;
@@ -36,6 +45,7 @@ body {
 h1, h2, h3, h4 {
     font-weight: 800;              /* Súper negrilla para títulos impactantes */
     letter-spacing: -0.5px;
+    color: var(--blanco);
     color: var(--blanco);
 }
 
@@ -55,12 +65,15 @@ p {
 
 /*ESTILOS DEL SPLASH SCREEN (SISTEMA DE ANIMACIÓN ORIGINAL + BANNER) */
 
+/*ESTILOS DEL SPLASH SCREEN (SISTEMA DE ANIMACIÓN ORIGINAL + BANNER) */
+
 #splash-screen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    background: #ffffff; /* Fondo oscuro base para dar profundidad tras el banner */
     background: #ffffff; /* Fondo oscuro base para dar profundidad tras el banner */
     display: flex;
     justify-content: center;
@@ -79,6 +92,7 @@ p {
     width: 100%; height: 100%;
     background: url('img/banner-splash.png') center/cover no-repeat;
     opacity: 0.50; /* Modificá este valor (0.1 a 0.9) para darle más o menos transparencia al banner */
+    opacity: 0.50; /* Modificá este valor (0.1 a 0.9) para darle más o menos transparencia al banner */
     z-index: 1;
 }
 
@@ -90,6 +104,9 @@ p {
     width: 100%;
     height: 100%;
     background: linear-gradient(180deg, 
+                rgba(252, 252, 252, 0.5) 0%, 
+                rgba(253, 252, 252, 0.989) 50%, 
+                rgba(255, 255, 255, 0.65) 100%);
                 rgba(252, 252, 252, 0.5) 0%, 
                 rgba(253, 252, 252, 0.989) 50%, 
                 rgba(255, 255, 255, 0.65) 100%);
@@ -106,6 +123,7 @@ p {
     justify-content: center;
     align-items: center;
     z-index: 3; /* Salta al frente de las texturas de fondo */
+
 }
 
 .contenedor-mapa {
@@ -131,14 +149,17 @@ p {
 .loader {
     position: fixed;
     bottom: 200px;
+    bottom: 200px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(40px);
     width: 40px;
     height: 40px;
     border: 4px solid rgba(255, 255, 255, 0.2);
     border-top: 2px solid var(--celeste);
+    border-top: 2px solid var(--celeste);
     border-radius: 50%;
     animation: girarLoader 0.8s linear infinite;
+    z-index: 3;
     z-index: 3;
 }
 
@@ -179,6 +200,7 @@ p {
 @keyframes viajeGuardabarranco {
     0% { transform: translate(-700px, 500px) rotate(-15deg) scale(0.3); opacity: 0; }
     15% { opacity: 1; filter: drop-shadow(0 0 20px var(--cian-vivido)); }
+    15% { opacity: 1; filter: drop-shadow(0 0 20px var(--cian-vivido)); }
     45% { transform: translate(-50px, 20px) rotate(-25deg) scale(1.2); }
     85% { opacity: 1; }
     100% { transform: translate(800px, -600px) rotate(-30deg) scale(0.5); opacity: 0; }
@@ -193,8 +215,10 @@ p {
     transform: scale(0);
     opacity: 0;
     animation: brotarPin 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    margin-top: -80px;
 }
 
+.pin { 
 .pin { 
     filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5)); 
 }
@@ -247,19 +271,23 @@ p {
 
 .logo-texto h2 { 
     color: var(--celeste); /* Cambiado a blanco para romper con el fondo y brillar con fuerza */
+    color: var(--celeste); /* Cambiado a blanco para romper con el fondo y brillar con fuerza */
     font-size: 44px; 
     margin: 0; 
     letter-spacing: 4px; 
     font-weight: 900; 
     text-shadow: 0 2px 5px var(--amarillo); 
+    text-shadow: 0 2px 5px var(--amarillo); 
 }
 
 .logo-texto p { 
+    color: var(--celeste-oscuro); /* Cambiado a oro artesanal para mejorar contraste contra el banner */
     color: var(--celeste-oscuro); /* Cambiado a oro artesanal para mejorar contraste contra el banner */
     font-size: 15px; 
     margin-top: 6px; 
     font-weight: 700; 
     letter-spacing: 1.5px; 
+    text-shadow: 0 2px 5px var(--amarillo);
     text-shadow: 0 2px 5px var(--amarillo);
     text-transform: uppercase;
 }
@@ -280,10 +308,20 @@ p {
     background-color: var(--bg-dark-card);
     border: 20px var(--celeste);
     box-shadow: 0 4px 12px rgba(0, 225, 255, 0.838);
+    border: 20px var(--celeste);
+    box-shadow: 0 4px 12px rgba(0, 225, 255, 0.838);
     padding: 0.5rem 2rem;
     position: sticky;
     top: 0;
+    top: 0;
     z-index: 100;
+    border-bottom: 1px solid rgba(244, 240, 240, 0.274);
+
+    transition: transform 0.3s ease;
+}
+
+.navbar.nav-hidden {
+    transform: translateY(-110%);
     border-bottom: 1px solid rgba(244, 240, 240, 0.274);
 
     transition: transform 0.3s ease;
@@ -315,8 +353,42 @@ p {
     font-weight: 900;             /* Ultra negrilla para la marca */
     color: var(--amarillo);
     text-shadow: 0px 2px 5px var(--blanco);
+    color: var(--amarillo);
+    text-shadow: 0px 2px 5px var(--blanco);
     letter-spacing: 1px;
 }
+
+.menu-nav {
+  position: relative;
+  padding: 10px 20px;
+}
+
+/* Ocultar el checkbox */
+#menu-toggle {
+  display: none;
+}
+
+/* Estilo del icono hamburguesa */
+.menu-icon {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+
+  
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  width: 30px;
+}
+
+.menu-icon span {
+  display: block;
+  height: 3px;
+  width: 100%;
+  background:var(--azul-oscuro);
+  transition: 0.3s;
 
 .menu-nav {
   position: relative;
@@ -388,13 +460,55 @@ background: #ffffff95;
   text-decoration: none;
   cursor: pointer;
   font-weight: bold;
+/* Ocultar los enlaces en móvil por defecto */
+.menu-links {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 1000;
+
+  font-size: 20px;
+  list-style: none;
+  margin: 0;
+  padding: 90px 30px 30px;
+background: #ffffff95;
 }
 
+.menu-links:hover, .menu-links.active {
+    color: var(--celeste);          /* Resaltado*/
+}
+
+.menu-links li {
+  list-style: none;
+}
+
+/* Mostrar el menú cuando el checkbox está seleccionado */
+#menu-toggle:checked ~ .menu-links {
+  display: block;
+}
+
+.menu-link {
+  display: block;
+  padding: 14px 0;
+  color: var(--azul-oscuro);
+  text-decoration: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.registro{
+    float: right;
 .registro{
     float: right;
 }
 
 .nav-btn-account {
+    background-color: rgba(242, 244, 246, 0.08);
+    color: var(--celeste) !important;
+    border: 2px solid var(--celeste);
     background-color: rgba(242, 244, 246, 0.08);
     color: var(--celeste) !important;
     border: 2px solid var(--celeste);
@@ -408,6 +522,8 @@ background: #ffffff95;
 }
 
 .nav-btn-account:hover {
+    background-color: var(--celeste) !important;
+    color: var(--blanco) !important;
     background-color: var(--celeste) !important;
     color: var(--blanco) !important;
 }
@@ -465,30 +581,34 @@ main {
     font-size: 2.5rem;
     font-weight: 800;
     color: var(--amarillo);
+    color: var(--amarillo);
 }
 
 .title-header h2 {
     font-size: 2.5rem;
     font-weight: 800;
     color: var(--amarillo);
+    color: var(--amarillo);
     text-shadow: 0 2px 5px rgb(251, 251, 252)
 }
 
 .title-header p {
     color: var(--Gris);
+    color: var(--Gris);
     font-size: 1.1rem;
     margin-top: 0.25rem;
 }
 
-/* ==========================================================================
-   VISTA: HOME (INICIO) - BANNER PERSONALIZADO
-   ========================================================================== */
+/* VISTA: HOME (INICIO) - BANNER PERSONALIZADO */
+
 .hero {
     padding: 10rem 2rem;
     text-align: center;
     background:  url('img/banner-nicaragua.jpg');
+    background:  url('img/banner-nicaragua.jpg');
     background-size: cover;
     background-position: center center;
+    color: var(--blanco);
     color: var(--blanco);
     border-radius: 1rem;
     border: 2px solid var(--borde-colonial);
@@ -501,6 +621,7 @@ main {
 
 .hero-content {
     max-width: 800px;
+    background: rgba(15, 79, 255, 0.434); /* Tono colonial oscuro legible */
     background: rgba(15, 79, 255, 0.434); /* Tono colonial oscuro legible */
     padding: 2.5rem 3rem;
     border-radius: 1rem;
@@ -528,7 +649,9 @@ main {
 .btn-map-start, .btn-auth, .btn-auth-secondary {
     font-weight: 900;    
     color: blanco;         /* Botones imponentes */
+    color: blanco;         /* Botones imponentes */
     letter-spacing: 0.5px;
+    background-color: var(--celeste);
     background-color: var(--celeste);
     border: none;
     padding: 0.75rem 1.5rem;
@@ -539,6 +662,7 @@ main {
 }
 
 .btn-map-start:hover {
+    background-color: var(--celeste-oscuro);
     background-color: var(--celeste-oscuro);
     transform: scale(1.05);
 }
@@ -554,6 +678,7 @@ main {
 
 /* TARJETAS CON TEXTURA INTEGRADA */
 .card {
+    background: rgba(28, 37, 65, 0.5);
     background: rgba(28, 37, 65, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 16px;
@@ -580,9 +705,11 @@ main {
 .card-body {
     padding: 2rem;
     background: rgba(28, 37, 65, 0.5); /* Ajustado para mantener la coherencia del Dark Mode */
+    background: rgba(28, 37, 65, 0.5); /* Ajustado para mantener la coherencia del Dark Mode */
 }
 
 .card-body p {
+    color: var(--text-ligh); /* Corregido: Texto claro sobre caja oscura */
     color: var(--text-ligh); /* Corregido: Texto claro sobre caja oscura */
     line-height: 1.6;
     margin-bottom: 1.5rem;
@@ -590,6 +717,7 @@ main {
 
 .card-action {
     font-weight: 600;             /* Negrilla para los llamados a la acción */
+    color: var(--amarillo);
     color: var(--amarillo);
     text-decoration: none;
 }
@@ -608,6 +736,7 @@ main {
     font-size: 2rem;
     margin-bottom: 1rem;
     color: var(--amarillo);          /* Título llamativo */
+    color: var(--amarillo);          /* Título llamativo */
 }
 
 .section-why p {
@@ -623,6 +752,7 @@ main {
    .map-interactive-wrapper {
     position: relative;
     background-color: rgba(11, 19, 41, 0.5);
+    border: 2px solid var(--celeste);
     border: 2px solid var(--celeste);
     border-radius: 0.5rem;
     padding: 2rem;
@@ -648,6 +778,8 @@ main {
 .text-map h2{
     color: var(--amarillo);
     text-shadow: 0 2px 5px var(--blanco);
+    color: var(--amarillo);
+    text-shadow: 0 2px 5px var(--blanco);
     float: right;
     text-align: center;
     margin-right:60px;
@@ -657,6 +789,7 @@ main {
 .information-box{
     position: relative;
     background-color: rgba(11, 19, 41, 0.5);
+    border: 2px solid var(--celeste);
     border: 2px solid var(--celeste);
     border-radius: 0.5rem;
     padding: 2rem;
@@ -677,14 +810,80 @@ main {
     font-size: 2.5rem;
     font-weight: 800;
     color: var(--amarillo);
+    color: var(--amarillo);
     text-shadow: 0 2px 5px rgb(251, 251, 252);
 }
 
 .information-box p {
     color: var(--Gris);
+    color: var(--Gris);
     font-size: 1.1rem;
     margin-top: 0.25rem;
     padding-left: 80px;
+}
+
+/*Pines de ubicacion*/
+
+.juigalpa {
+  fill: #F54927;
+  opacity: 0.4;
+  animation: pulso 2s infinite;
+  transform-origin: 503.3px 607.5px; 
+}
+
+.granada {
+  fill: #00f610;
+  opacity: 0.4;
+  animation: pulso 2s infinite;
+  transform-origin: 382.7px 635.1px; 
+}
+
+.managua {
+  fill: #ffffff;
+  opacity: 0.4;
+  animation: pulso 2s infinite;
+  transform-origin: 305.6px 562.3px; 
+}
+
+.masaya {
+  fill: #f527c8;
+  opacity: 0.4;
+  animation: pulso 2s infinite;
+  transform-origin: 339px 608.4px; 
+}
+
+.leon {
+  fill: #eeff00;
+  opacity: 0.4;
+  animation: pulso 2s infinite;
+  transform-origin: 237.6px 514.5px; 
+}
+
+.matagalpa {
+  fill: #ff0000;
+  opacity: 0.4;
+  animation: pulso 2s infinite;
+  transform-origin: 441px 424.8px; 
+}
+
+.bluefields {
+  fill: #05006d;
+  opacity: 0.4;
+  animation: pulso 2s infinite;
+  transform-origin: 669.8px 540.2px; 
+}
+
+.esteli {
+  fill: #550092;
+  opacity: 0.4;
+  animation: pulso 2s infinite;
+  transform-origin: 282.5px 377.4px; 
+}
+
+/* Animación de onda para el pin de círculo */
+@keyframes pulso {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(2.5); opacity: 0; }
 }
 
 /*Pines de ubicacion*/
@@ -762,12 +961,15 @@ main {
     text-align: center;
     font-size: 22px;
     color: var(--amarillo);
+    color: var(--amarillo);
     text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
 }
 
 /* El contenedor que agrupa todas las imágenes (originales y duplicadas) */
 .slider-track {
   display: flex;
+  flex-wrap: nowrap;
+  width: 5000px; /* Se estira automáticamente según las imágenes */
   flex-wrap: nowrap;
   width: 5000px; /* Se estira automáticamente según las imágenes */
   animation: flujo-infinito 25s linear infinite;
@@ -779,6 +981,7 @@ main {
 }
  
 .slider-track img {
+  width: 280px;      
   width: 280px;      
   height: 150px;
   object-fit: cover;
@@ -793,6 +996,8 @@ main {
     transform: translateX(-50%); 
   }
 }
+
+/* VISTA: SECCIÓN UNIFICADA CIUDADES CREATIVAS & FILTROS */
 
 /* VISTA: SECCIÓN UNIFICADA CIUDADES CREATIVAS & FILTROS */
 
@@ -831,7 +1036,10 @@ main {
     border-radius: 0.35rem;
     border: 2px solid var(--celeste);
     background-color: var(--azul-oscuro);
+    border: 2px solid var(--celeste);
+    background-color: var(--azul-oscuro);
     font-weight: 600;
+    color: var(--blanco); /* Corregido para visualización legible */
     color: var(--blanco); /* Corregido para visualización legible */
     outline: none;
     cursor: pointer;
@@ -848,9 +1056,11 @@ main {
     padding: 0.6rem 1.2rem;
     border: 1px solid var(--borde-colonial);
     background: var(--azul-oscuro);
+    background: var(--azul-oscuro);
     border-radius: 2rem;
     font-size: 0.9rem;
     font-weight: 600;
+    color: var(--Gris);
     color: var(--Gris);
     cursor: pointer;
     display: flex;
@@ -862,9 +1072,13 @@ main {
 .tab-filter:hover {
     background: var(--bg-dark-card);
     color: var(--blanco);
+    color: var(--blanco);
 }
 
 .tab-filter.active {
+    background: var(--celeste);
+    color: var(--blanco);
+    border-color: var(--celeste);
     background: var(--celeste);
     color: var(--blanco);
     border-color: var(--celeste);
@@ -899,6 +1113,7 @@ main {
     font-size: 1.4rem;
     font-weight: 800;
     color: var(--blanco);
+    color: var(--blanco);
     margin-bottom: 0.5rem;
 }
 
@@ -912,12 +1127,14 @@ main {
 
 .site-meta .rating {
     color: var(--amarillo);
+    color: var(--amarillo);
     display: flex;
     align-items: center;
     gap: 0.15rem;
 }
 
 .site-meta .visitors {
+    color: var(--Gris);
     color: var(--Gris);
     display: flex;
     align-items: center;
@@ -939,6 +1156,7 @@ main {
 
 .tag {
     background-color: var(--azul-oscuro);
+    background-color: var(--azul-oscuro);
     color: var(--text-light);
     font-size: 0.75rem;
     font-weight: 700;
@@ -955,6 +1173,8 @@ main {
 .badge-cat {
     font-size: 0.65rem;
     padding: 0.2rem 0.5rem;
+    background: var(--azul-oscuro);
+    color: var(--amarillo);
     background: var(--azul-oscuro);
     color: var(--amarillo);
     border-radius: 0.25rem;
@@ -976,6 +1196,7 @@ main {
 }
 
 /* VISTA: GALERÍA COLECTIVA */
+/* VISTA: GALERÍA COLECTIVA */
 .gallery-header-container {
     display: flex;
     justify-content: space-between;
@@ -985,6 +1206,7 @@ main {
 }
 
 .btn-open-upload {
+    background-color: var(--celeste, #3b82f6);
     background-color: var(--celeste, #3b82f6);
     color: #ffffff;
     border: none;
@@ -1043,6 +1265,7 @@ main {
 
 /* --- CAPA OSCURA INFERIOR PARA LEGIBILIDAD DEL TEXTO --- */
 
+
 .card-image-wrapper::after {
     content: '';
     position: absolute;
@@ -1058,6 +1281,7 @@ main {
 }
 
 /* --- TEXTO FLOTANTE SOBRE EL MULTIMEDIA --- */
+
 
 .card-content {
     position: absolute;
@@ -1119,6 +1343,7 @@ main {
 
 /* --- HOVER EFFECTS (EFECTOS DE ENFOQUE) --- */
 
+
 .gallery-card:hover {
     transform: scale(1.03) translateY(-4px);
 }
@@ -1148,6 +1373,7 @@ main {
     font-size: 1rem;
 }
 
+/* MODAL DE BITÁCORA: SUPERPOSICIÓN Y EFECTO BLUR */
 /* MODAL DE BITÁCORA: SUPERPOSICIÓN Y EFECTO BLUR */
 
 /* Contenedor del fondo que cubre toda la pantalla */
@@ -1328,6 +1554,9 @@ main {
 /* INTERACCIONES EN TARJETAS (LIKES, COMENTARIOS, GUARDAR) */
 
    .card-actions-bar {
+/* INTERACCIONES EN TARJETAS (LIKES, COMENTARIOS, GUARDAR) */
+
+   .card-actions-bar {
     display: flex;
     align-items: center;
     gap: 1.25rem;
@@ -1391,6 +1620,9 @@ main {
 
 /* VISTA: YAPTI (IA) */
 
+
+/* VISTA: YAPTI (IA) */
+
 .ia-bg {
     background: radial-gradient(circle at top right, rgba(58, 134, 255, 0.05), transparent);
 }
@@ -1404,6 +1636,8 @@ main {
 .ia-header-icon {
     width: 4.5rem;
     height: 4.5rem;
+    background-color: var(--celeste);
+    color: var(--blanco);
     background-color: var(--celeste);
     color: var(--blanco);
     border-radius: 50%;
@@ -1441,6 +1675,8 @@ main {
 .btn-quick:hover {
     border-color: var(--celeste);
     background-color: var(--azul-oscuro);
+    border-color: var(--celeste);
+    background-color: var(--azul-oscuro);
     transform: translateY(-1px);
 }
 
@@ -1462,6 +1698,7 @@ main {
     flex-direction: column;
     gap: 1.25rem;
     background-color: var(--azul-oscuro);
+    background-color: var(--azul-oscuro);
 }
 
 .message {
@@ -1475,12 +1712,16 @@ main {
 .message.user {
     background-color: var(--celeste);
     color: var(--blanco);
+    background-color: var(--celeste);
+    color: var(--blanco);
     align-self: flex-end;
     border-bottom-right-radius: 0;
 }
 
 .message.ai {
     background-color: #060079; /* Legibilidad total en el contenedor interno */
+    border: 1px solid var(--celeste);
+    color: var(--blanco);
     border: 1px solid var(--celeste);
     color: var(--blanco);
     align-self: flex-start;
@@ -1497,7 +1738,10 @@ main {
 
 /* VISTA: REGISTRO / AUTENTICACIÓN / MI PERFIL */
 
+/* VISTA: REGISTRO / AUTENTICACIÓN / MI PERFIL */
+
 /* Container Principal del Perfil */
+
 
 #auth-profile-container {
     max-width: 600px;
@@ -1614,6 +1858,8 @@ main {
     flex: 2;
     background: var(--azul-oscuro);
     color: var(--azul-oscuro);
+    background: var(--azul-oscuro);
+    color: var(--azul-oscuro);
     border: none;
     padding: 1rem;
     border-radius: 12px;
@@ -1627,6 +1873,7 @@ main {
 }
 
 .btn-profile-edit:hover {
+    background: var(--celeste-oscuro);
     background: var(--celeste-oscuro);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 180, 216, 0.4);
@@ -1646,6 +1893,7 @@ main {
 
 .btn-profile-logout:hover {
     background: var(--red);
+    color: var(--azul-oscuro);
     color: var(--azul-oscuro);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4);
@@ -1668,11 +1916,15 @@ main {
 }
 .border-left-blue { border-left: 6px solid var(--celeste) !important; }
 .border-left-amarillo { border-left: 6px solid var(--amarillo) !important; }
+.border-left-blue { border-left: 6px solid var(--celeste) !important; }
+.border-left-amarillo { border-left: 6px solid var(--amarillo) !important; }
 
 .input-wrapper input {
     width: 100%;
     padding: 0.75rem 1rem 0.75rem 2.5rem;
     border: 1px solid var(--borde-colonial);
+    background-color: var(--azul-oscuro);
+    color: var(--blanco);
     background-color: var(--azul-oscuro);
     color: var(--blanco);
     border-radius: 0.35rem;
@@ -1683,6 +1935,7 @@ main {
 .btn-auth-secondary {
     width: 100%;
     background: linear-gradient(135deg, #f59e0b, #b45309);
+    color: var(--azul-oscuro);
     color: var(--azul-oscuro);
     border: none;
     padding: 1rem;
@@ -1711,6 +1964,8 @@ main {
 
 /*  KEYFRAMES ADICIONALES DE LA APLICACIÓN */
 
+/*  KEYFRAMES ADICIONALES DE LA APLICACIÓN */
+
 @keyframes fadeInView { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes pinPulseEffect { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
 /* Asegurar que todas las secciones estén ocultas por defecto */
@@ -1731,6 +1986,9 @@ main {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
+/* NOTIFICACIONES DINÁMICAS */
+
 
 /* NOTIFICACIONES DINÁMICAS */
 
@@ -1767,6 +2025,7 @@ main {
 }
 
 /* Variación según el tipo de mensaje */
+.toast-card.cian-vivido {
 .toast-card.cian-vivido {
     border-left: 4px solid #10b981; /* Verde esmeralda para éxitos */
 }
@@ -1840,6 +2099,7 @@ main {
     background: url('img/banner-nicaragua.jpg');
     background-size: cover;
     color: var(--blanco);
+    color: var(--blanco);
     display: flex;
     padding-bottom: 0;
 }
@@ -1861,6 +2121,7 @@ main {
     text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
     padding-top: 50px;
     color: var(--amarillo); 
+    color: var(--amarillo); 
     text-transform: uppercase; 
 }
 
@@ -1877,6 +2138,7 @@ main {
 #contenedor-ciudades{
      padding: 20px;
     background: linear-gradient(100deg, rgba(0, 30, 90, 0.6), rgba(22, 29, 34, 0.5));
+    color: var(--blanco);
     color: var(--blanco);
     border-radius: 1rem;
     border: 2px solid var(--borde-colonial);
@@ -1921,6 +2183,7 @@ padding-top: 80px;
 
 .carrusel h3{
     font-size: 22px;
+    color: var(--amarillo);
     color: var(--amarillo);
     text-shadow: 0 2px 5px rgba(255, 255, 255, 0.8);
 }
@@ -1970,6 +2233,7 @@ padding-top: 80px;
     background-color: rgba(8, 8, 138, 0.514);
     background-position: 20px;
     border-color: var(--blanco);
+    border-color: var(--blanco);
     border-radius: 8px;
 
 }
@@ -1980,6 +2244,8 @@ padding-top: 80px;
     padding-bottom: 0px;
     padding-top: 8px;
 }
+/* FOOTER */
+
 /* FOOTER */
 
 .main-footer {

@@ -1,3 +1,6 @@
+require('dotenv').config();
+
+const { createClient } = require('@supabase/supabase-js');
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -5,6 +8,20 @@ const path = require('path');
 
 const app = express();
 const PORT = 3000;
+
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error('Faltan las variables de Supabase en el archivo .env');
+}
+
+const supabaseAuth = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_PUBLISHABLE_KEY
+);
 
 // Middlewares - Aumentamos el límite para permitir imágenes Base64 pesadas
 app.use(cors());
@@ -56,64 +73,69 @@ function crearTablas() {
    ========================================================================== */
 
 // Registro de usuarios - Corregidos los parámetros de Express (req, res)
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
     const { username, email, password } = req.body;
-    
-    // Validar que no vengan vacíos ni con espacios en blanco
-    if (!username || !email || !password || username.trim() === "" || email.trim() === "" || password.trim() === "") {
-        return res.status(400).json({ success: false, error: 'Todos los campos son requeridos.' });
+
+    if (!username || !email || !password) {
+        return res.status(400).json({
+            success: false,
+            error: 'Todos los campos son requeridos.'
+        });
     }
 
-    // Forzamos minúsculas en el email para evitar problemas de mayúsculas/minúsculas al loguearse
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanUsername = username.trim();
-    const cleanPassword = password.trim();
-
-    const query = `INSERT INTO users (username, email, password, city, avatar) VALUES (?, ?, ?, ?, ?)`;
-    
-    // Pasamos 'Granada' como ciudad por defecto y un string vacío para el avatar inicial
-    db.run(query, [cleanUsername, cleanEmail, cleanPassword, 'Granada', ''], function (err) {
-        if (err) {
-            console.error("Error al registrar usuario en SQLite:", err.message);
-            if (err.message.includes('UNIQUE')) {
-                return res.status(400).json({ success: false, error: 'El correo electrónico ya está registrado.' });
-            }
-            return res.status(500).json({ success: false, error: 'Error interno al crear la cuenta.' });
+    const { data, error } = await supabase.auth.admin.createUser({
+        email: email.trim().toLowerCase(),
+        password: password.trim(),
+        email_confirm: true,
+        user_metadata: {
+            username: username.trim()
         }
-        
-        console.log(`Usuario registrado con éxito. ID: ${this.lastID} - Nombre: ${cleanUsername}`);
-        res.json({ success: true, message: '¡Cuenta creada con éxito! Ya puedes iniciar sesión.' });
+    });
+
+    if (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.message
+        });
+    }
+
+    res.json({
+        success: true,
+        message: '¡Cuenta creada con éxito!'
     });
 });
 
 // Endpoint de Login - Sincronizado perfectamente con el registro
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-        return res.status(400).json({ success: false, error: 'Por favor, introduce tu correo y contraseña.' });
+    const { data, error } = await supabaseAuth.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password: password.trim()
+    });
+
+    if (error || !data.user) {
+        return res.status(400).json({
+            success: false,
+            error: 'Credenciales incorrectas.'
+        });
     }
 
-    // Buscamos transformando a minúsculas para que coincida con el registro
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanPassword = password.trim();
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('username, city, avatar_url')
+        .eq('id', data.user.id)
+        .single();
 
-    const query = `SELECT id, username, email, city, avatar FROM users WHERE LOWER(email) = ? AND password = ?`;
-    
-    db.get(query, [cleanEmail, cleanPassword], (err, user) => {
-        if (err) {
-            console.error("Error en consulta de Login:", err.message);
-            return res.status(500).json({ success: false, error: 'Error en el servidor al procesar el reingreso.' });
+    res.json({
+        success: true,
+        user: {
+            id: data.user.id,
+            username: profile?.username || data.user.user_metadata.username,
+            email: data.user.email,
+            city: profile?.city || 'Granada',
+            avatar: profile?.avatar_url || ''
         }
-        
-        if (!user) {
-            // Si no encuentra el registro exacto de correo y contraseña
-            return res.status(400).json({ success: false, error: 'Credenciales incorrectas o usuario no encontrado.' });
-        }
-
-        // Login exitoso: Devolvemos el objeto tal y como lo espera checkSession()
-        console.log(`Sesión iniciada por el explorador: @${user.username}`);
-        res.json({ success: true, user });
     });
 });
 
