@@ -238,6 +238,46 @@ function navigateTo(viewId) {
         '/bluefields': 'view-bluefields'
         
     };
+    
+  const navbar = document.querySelector('.navbar');
+  const menuToggle = document.querySelector('#menu-toggle');
+  let ultimoScroll = window.scrollY;
+
+  window.addEventListener('scroll', () => {
+    const scrollActual = window.scrollY;
+
+    // Cuando el menú hamburguesa está abierto, la navbar no se oculta.
+    if (menuToggle.checked) {
+      navbar.classList.remove('nav-hidden');
+      ultimoScroll = scrollActual;
+      return;
+    }
+
+    // Baja: ocultar, solo después de pasar 80px.
+    if (scrollActual > ultimoScroll && scrollActual > 80) {
+      navbar.classList.add('nav-hidden');
+    }
+
+    // Sube aunque sea un poco: mostrar.
+    if (scrollActual < ultimoScroll) {
+      navbar.classList.remove('nav-hidden');
+    }
+
+    ultimoScroll = scrollActual;
+  });
+
+  // Al abrir el menú, asegurar que la barra sea visible.
+  menuToggle.addEventListener('change', () => {
+    if (menuToggle.checked) {
+      navbar.classList.remove('nav-hidden');
+    }
+  });
+
+     document.querySelectorAll('.menu-link').forEach((link) => {
+  link.addEventListener('click', () => {
+    document.querySelector('#menu-toggle').checked = false;
+  });
+});
 
     const targetId = idMap[viewId] || 'view-404';
     const targetElement = document.getElementById(targetId);
