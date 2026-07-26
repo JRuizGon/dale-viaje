@@ -47,12 +47,14 @@ p {
 
 /* Textura sutil inspirada en diseños Mesoamericanos de fondo */
 .textura-patria {
-    background-image: radial-gradient(var(--blanco) 0.5px, transparent 0.5px), 
-                      radial-gradient(var(--blanco) 0.5px, var(--azul-oscuro) 0.5px);
-    background-size: 40px 40px;
-    background-position: 0 0, 20px 20px;
+  background-color: var(--azul-oscuro);
+  background-image:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%),
+    radial-gradient(circle, rgba(255, 201, 40, 0.10) 1px, transparent 1.5px);
+  background-size: 36px 36px;
+  background-position: 0 0, 18px 18px, 0 0;
 }
-
 /*ESTILOS DEL SPLASH SCREEN (SISTEMA DE ANIMACIÓN ORIGINAL + BANNER) */
 
 #splash-screen {
@@ -200,38 +202,34 @@ p {
 }
 
 /* Conservando colores distintivos aplicados a tus delays */
-.pin-1 { 
+.pin-1 {
   /* Boaco */
-  top: calc(57.5% + 1rem);
-  left: calc(45.3% + 1rem);
-  fill: var(--celeste); 
-  animation-delay: 1.5s; 
+  top: calc(43.5% + 1rem);
+  left: calc(37.3% + 1rem);
+  fill: var(--celeste);
+  animation-delay: 1.5s;
 } 
-
-.pin-2 { 
+.pin-2 {
   /* Atlántico Norte */
   top: calc(26.4% + 1rem);
   left: calc(68.4% + 1rem);
-  fill: var(--amarillo); 
-  animation-delay: 1.8s; 
+  fill: var(--amarillo);
+  animation-delay: 1.8s;
 } 
-
-.pin-3 { 
+.pin-3 {
   /* Atlántico Sur */
-  top: calc(61.5% + 1rem);
-  left: calc(70% + 1rem);
-  fill: var(--cian-vivido); 
-  animation-delay: 2.1s; 
+  top: calc(59% + 1rem);
+  left: calc(60% + 1rem);
+  fill: var(--cian-vivido);
+  animation-delay: 2.1s;
 } 
-
-.pin-4 { 
+.pin-4 {
   /* Granada */
-  top: calc(71.1% + 1rem);
-  left: calc(38.3% + 1rem);
-  fill: var(--celeste-oscuro); 
-  animation-delay: 2.4s; 
+  top: calc(50.1% + 1rem);
+  left: calc(15.3% + 1rem);
+  fill: var(--celeste-oscuro);
+  animation-delay: 2.4s;
 }
-
 @keyframes brotarPin {
     0% { transform: scale(2.2); opacity: 0; }
     100% { transform: scale(1); opacity: 1; }
@@ -2829,4 +2827,197 @@ padding-top: 80px;
     .home-benefit strong { font-size: 0.83rem; }
     .home-discover { padding: 4.2rem 1.25rem 1.8rem; border-radius: 0 0 1.2rem 1.2rem; }
     .home-destination-card { height: 175px; }
+}
+
+@media screen and (min-width: 768px) {
+  .navbar .menu-icon {
+    display: none !important;
+  }
+
+  .navbar .menu-links {
+    display: flex !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    gap: 22px;
+    align-items: center;
+  }
+
+  .navbar .menu-links li {
+    list-style: none;
+  }
+
+  .navbar .menu-links .menu-link {
+    display: block;
+    padding: 8px 0 !important;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+
+  .navbar .menu-nav {
+    padding: 0;
+  }
+}
+
+/* ===== DISEÑO MODERNO: PÁGINAS DE CIUDADES ===== */
+
+.ciudades-style {
+  width: min(1180px, calc(100% - 2rem));
+  margin: 2rem auto 4rem;
+  display: block;
+  color: var(--blanco);
+  background:
+    linear-gradient(135deg, rgba(6, 44, 105, 0.88), rgba(8, 43, 98, 0.65)),
+    url("img/banner-nicaragua.jpg") center / cover;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 45px rgba(6, 44, 105, 0.25);
+}
+
+.style {
+  width: auto;
+  padding: clamp(2rem, 5vw, 4rem);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 0;
+}
+
+.ciudades-style h1 {
+  margin: 0 0 1rem;
+  padding: 0;
+  color: var(--amarillo);
+  font-size: clamp(2.2rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+.ciudades-style > .style > p {
+  max-width: 850px;
+  margin: 0 auto 2.5rem;
+  color: rgba(255, 255, 255, 0.94);
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.8;
+  text-shadow: none;
+}
+
+/* Cuadrícula: carrusel y mapa */
+#contenedor-ciudades {
+  width: auto;
+  height: auto;
+  position: static;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Tarjeta del carrusel */
+.carrusel {
+  width: auto;
+  height: auto;
+  min-height: 350px;
+  float: none;
+  margin: 0;
+  padding: 1.25rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.carrusel h3 {
+  margin: 0 0 1rem;
+  color: var(--azul-oscuro);
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-shadow: none;
+}
+
+.carrusel ul {
+  margin: 0;
+}
+
+.carrusel img {
+  width: 100%;
+  height: 250px;
+  display: block;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.text-carrusel h3 {
+  margin: 0.9rem 0 0;
+  color: var(--azul-oscuro);
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* Tarjeta del mapa */
+.mapa-ciudades {
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 1.25rem;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.top h1 {
+  margin: 0 0 1rem;
+  padding: 0;
+  color: var(--azul-oscuro);
+  font-size: 1.25rem;
+  text-align: left;
+  text-shadow: none;
+}
+
+.mapa-ciudades iframe {
+  display: block;
+  width: 100% !important;
+  height: 300px !important;
+  border: 0;
+  border-radius: 12px;
+}
+
+/* Teléfono */
+@media (max-width: 767px) {
+  .ciudades-style {
+    width: calc(100% - 1rem);
+    margin: 1rem auto 2rem;
+    border-radius: 16px;
+  }
+
+  .style {
+    padding: 1.5rem 1rem;
+  }
+
+  #contenedor-ciudades {
+    grid-template-columns: 1fr;
+  }
+
+  .carrusel img {
+    height: 220px;
+  }
+
+  .mapa-ciudades iframe {
+    height: 260px !important;
+  }
 }
