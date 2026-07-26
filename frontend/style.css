@@ -107,9 +107,6 @@ p {
                 rgba(252, 252, 252, 0.5) 0%, 
                 rgba(253, 252, 252, 0.989) 50%, 
                 rgba(255, 255, 255, 0.65) 100%);
-                rgba(252, 252, 252, 0.5) 0%, 
-                rgba(253, 252, 252, 0.989) 50%, 
-                rgba(255, 255, 255, 0.65) 100%);
     z-index: 2;
 }
 
@@ -218,7 +215,6 @@ p {
     margin-top: -80px;
 }
 
-.pin { 
 .pin { 
     filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.5)); 
 }
@@ -390,6 +386,8 @@ p {
   background:var(--azul-oscuro);
   transition: 0.3s;
 
+}
+
 .menu-nav {
   position: relative;
   padding: 10px 20px;
@@ -453,14 +451,6 @@ background: #ffffff95;
   display: block;
 }
 
-.menu-link {
-  display: block;
-  padding: 14px 0;
-  color: var(--azul-oscuro);
-  text-decoration: none;
-  cursor: pointer;
-  font-weight: bold;
-/* Ocultar los enlaces en móvil por defecto */
 .menu-links {
   display: none;
   position: fixed;
@@ -499,8 +489,6 @@ background: #ffffff95;
   font-weight: bold;
 }
 
-.registro{
-    float: right;
 .registro{
     float: right;
 }
@@ -3096,3 +3084,5 @@ padding-top: 80px;
     .home-discover { padding: 4.2rem 1.25rem 1.8rem; border-radius: 0 0 1.2rem 1.2rem; }
     .home-destination-card { height: 175px; }
 }
+}
+   }
