@@ -1,0 +1,21 @@
+{
+  "name": "dale-viaje",
+  "version": "1.0.0",
+  "description": "**Dale Viaje** es una plataforma web interactiva diseñada para que viajeros compartan sus aventuras, fotos y descubrimientos de destinos turísticos. El proyecto cuenta con un sistema de autenticación de usuarios, una galería dinámica y persistencia de datos local para registrar cada experiencia.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JRuizGon/dale-viaje.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JRuizGon/dale-viaje/issues"
+  },
+  "homepage": "https://github.com/JRuizGon/dale-viaje#readme"
+}
