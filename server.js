@@ -5,9 +5,24 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
+const multer = require('multer');
 
 const app = express();
 const PORT = 3000;
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+        fileSize: 5 * 1024 * 1024
+    },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Solo se permiten imágenes.'));
+        }
+    }
+});
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -135,59 +150,153 @@ app.post('/api/login', async (req, res) => {
             email: data.user.email,
             city: profile?.city || 'Granada',
             avatar: profile?.avatar_url || ''
-        }
+        },
+        access_token: data.session.access_token
+
     });
 });
 
 // Actualización de Perfil (Utilizado por tu función saveProfile)
-app.post('/api/update-profile', (req, res) => {
-    const { username, city, email } = req.body;
+app.post('/api/update-profile', async (req, res) => {
+    const { username, city } = req.body;
+    const token = req.headers.authorization?.replace('Bearer ', '');
 
-    if (!username || !email) {
-        return res.status(400).json({ success: false, error: 'El nombre de usuario y email son obligatorios.' });
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            error: 'Sesión no válida.'
+        });
     }
 
-    const query = `UPDATE users SET username = ?, city = ? WHERE email = ?`;
-    db.run(query, [username, city, email], function (err) {
-        if (err) {
-            return res.status(500).json({ success: false, error: err.message });
-        }
-        res.json({ success: true, message: 'Perfil actualizado correctamente.' });
+    const { data: authData, error: authError } =
+        await supabaseAuth.auth.getUser(token);
+
+    if (authError || !authData.user) {
+        return res.status(401).json({
+            success: false,
+            error: 'Sesión expirada o inválida.'
+        });
+    }
+
+    const { error } = await supabase
+        .from('profiles')
+        .update({
+            username: username.trim(),
+            city: city.trim() || 'Granada'
+        })
+        .eq('id', authData.user.id);
+
+    if (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+
+    res.json({
+        success: true,
+        message: 'Perfil actualizado correctamente.'
     });
 });
-
 
 /* ==========================================================================
     ENDPOINTS DE LA GALERÍA / BITÁCORA VIAJERA
    ========================================================================== */
 
 // Subir un momento viajero (Guarda la imagen Base64 y los metadatos)
-app.post('/api/upload', (req, res) => {
-    const { url, location, description } = req.body;
+app.post('/api/upload', upload.single('image'), async (req, res) => {
+    const token = req.headers.authorization?.replace('Bearer ', '');
 
-    if (!url || !location) {
-        return res.status(400).json({ success: false, error: 'Faltan datos obligatorios (Imagen o Locación).' });
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            error: 'Debes iniciar sesión para publicar.'
+        });
     }
 
-    const query = `INSERT INTO gallery (url, location, description) VALUES (?, ?, ?)`;
-    db.run(query, [url, location, description], function (err) {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ success: false, error: 'Error al registrar en la base de datos.' });
-        }
-        res.json({ success: true, id: this.lastID });
+    const { data: authData, error: authError } =
+        await supabaseAuth.auth.getUser(token);
+
+    if (authError || !authData.user) {
+        return res.status(401).json({
+            success: false,
+            error: 'Sesión inválida o expirada.'
+        });
+    }
+
+    if (!req.file || !req.body.location) {
+        return res.status(400).json({
+            success: false,
+            error: 'La imagen y la ubicación son obligatorias.'
+        });
+    }
+
+    const extension = path.extname(req.file.originalname) || '.jpg';
+    const filePath = `${authData.user.id}/${Date.now()}${extension}`;
+
+    const { error: storageError } = await supabase.storage
+        .from('gallery')
+        .upload(filePath, req.file.buffer, {
+            contentType: req.file.mimetype,
+            upsert: false
+        });
+
+    if (storageError) {
+        return res.status(500).json({
+            success: false,
+            error: storageError.message
+        });
+    }
+
+    const { data: urlData } = supabase.storage
+        .from('gallery')
+        .getPublicUrl(filePath);
+
+    const { data: publication, error: dbError } = await supabase
+        .from('gallery')
+        .insert({
+            user_id: authData.user.id,
+            image_url: urlData.publicUrl,
+            location: req.body.location.trim(),
+            description: req.body.description?.trim() || ''
+        })
+        .select()
+        .single();
+
+    if (dbError) {
+        return res.status(500).json({
+            success: false,
+            error: dbError.message
+        });
+    }
+
+    res.json({
+        success: true,
+        publication
     });
 });
 
 // Obtener toda la galería (Llamado por renderGallery)
-app.get('/api/gallery', (req, res) => {
-    const query = `SELECT * FROM gallery ORDER BY id DESC`;
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ success: false, error: err.message });
-        }
-        res.json(rows);
-    });
+app.get('/api/gallery', async (req, res) => {
+    const { data, error } = await supabase
+        .from('gallery')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        return res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+
+    const gallery = data.map(item => ({
+        ...item,
+        url: item.image_url,
+        is_saved: item.is_saved ? 1 : 0
+    }));
+
+    res.json(gallery);
 });
 
 // Interacciones dinámicas: Likes y Guardados (Manejado por tus funciones toggleLike y toggleSave)

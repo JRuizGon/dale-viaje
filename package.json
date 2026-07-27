@@ -17,5 +17,8 @@
   "bugs": {
     "url": "https://github.com/JRuizGon/dale-viaje/issues"
   },
-  "homepage": "https://github.com/JRuizGon/dale-viaje#readme"
+  "homepage": "https://github.com/JRuizGon/dale-viaje#readme",
+  "dependencies": {
+    "multer": "^2.2.0"
+  }
 }

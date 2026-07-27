@@ -493,58 +493,60 @@ function closeModalOnOverlay(e) { if (e.target.id === 'upload-modal') closeModal
 
 async function handleUploadSubmit(event) {
     event.preventDefault();
+
     const locationInput = document.getElementById('form-location');
     const fileInput = document.getElementById('form-file');
     const descInput = document.getElementById('form-desc');
 
-    if (!locationInput || !fileInput || !descInput || !fileInput.files[0]) {
-        showToast("Por favor, selecciona un archivo de tu dispositivo.", "error");
+    const session = localStorage.getItem('viajero_session');
+    const user = session ? JSON.parse(session) : null;
+
+    if (!user?.access_token) {
+        showToast('Inicia sesión para publicar una fotografía.', 'error');
         return;
     }
 
-    const archivo = fileInput.files[0];
-    const convertToBase64 = (file) => new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = (error) => reject(error);
-    });
+    if (!locationInput || !fileInput || !fileInput.files[0]) {
+        showToast('Selecciona una imagen y escribe la ubicación.', 'error');
+        return;
+    }
+
+    const btnSubmit = event.target.querySelector('button[type="submit"]');
+    const textoOriginal = btnSubmit.innerText;
 
     try {
-        const btnSubmit = event.target.querySelector('button[type="submit"]');
-        const textoOriginal = btnSubmit.innerText;
-        btnSubmit.innerText = "PROCESANDO ARCHIVO...";
+        btnSubmit.innerText = 'SUBIENDO FOTO...';
         btnSubmit.disabled = true;
 
-        const base64Data = await convertToBase64(archivo);
-        const payload = {
-            url: base64Data,
-            location: locationInput.value.trim(),
-            description: descInput.value.trim()
-        };
+        const formData = new FormData();
+        formData.append('image', fileInput.files[0]);
+        formData.append('location', locationInput.value.trim());
+        formData.append('description', descInput.value.trim());
 
         const response = await fetch(`${API_URL}/api/upload`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            headers: {
+                'Authorization': `Bearer ${user.access_token}`
+            },
+            body: formData
         });
+
         const data = await response.json();
 
         if (response.ok && data.success) {
-            showToast('¡Tu momento viajero ha sido publicado con éxito!');
-            locationInput.value = '';
-            fileInput.value = '';
-            descInput.value = '';
+            showToast('¡Tu momento viajero fue publicado!');
+            event.target.reset();
             closeModal();
             renderGallery();
         } else {
-            showToast(`Error: ${data.error || 'No se pudo guardar.'}`, "error");
+            showToast(data.error || 'No se pudo publicar la foto.', 'error');
         }
+    } catch (error) {
+        console.error(error);
+        showToast('Error de comunicación con el servidor.', 'error');
+    } finally {
         btnSubmit.innerText = textoOriginal;
         btnSubmit.disabled = false;
-    } catch (error) {
-        console.error('Error al procesar el archivo local:', error);
-        showToast('Hubo un error de red o el archivo es demasiado pesado.', "error");
     }
 }
 
@@ -679,6 +681,7 @@ async function handleLogin(event) {
             showToast(`¡Bienvenido de nuevo, ${data.user.username}!`);
             
             // Guardamos la sesión activa usando tu clave global viajero_session
+            data.user.access_token = data.access_token;
             localStorage.setItem('viajero_session', JSON.stringify(data.user));
             event.target.reset();
             
@@ -815,11 +818,19 @@ async function saveProfile() {
     try {
         const res = await fetch(`${API_URL}/api/update-profile`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: nuevoUser, city: nuevaCiudad, email: user.email })
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.access_token}`
+        },
+        body: JSON.stringify({
+            username: nuevoUser,
+            city: nuevaCiudad
+})
         });
 
-        if (res.ok) {
+        const data = await res.json();
+
+            if (res.ok && data.success) {
             showToast("¡Perfil de explorador actualizado!");
             user.username = nuevoUser;
             user.city = nuevaCiudad;
@@ -827,9 +838,9 @@ async function saveProfile() {
             
             toggleEdit();
             checkSession();
-        } else {
-            showToast("Error al guardar los cambios en el servidor.", "error");
-        }
+     } else {
+    showToast(data.error || "Error al guardar los cambios en el servidor.", "error");
+    }
     } catch (error) {
         showToast("Error de comunicación.", "error");
     }
