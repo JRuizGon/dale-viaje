@@ -2675,8 +2675,8 @@ padding-top: 80px;
 }
 
 .home-benefit > svg {
-    width: 2rem;
-    height: 2rem;
+    width: 4rem;
+    height: 4rem;
     padding: 0.75rem;
     border-radius: 50%;
 }
@@ -2689,7 +2689,8 @@ padding-top: 80px;
     line-height: 1.2;
 }
 
-.home-benefit strong { font-size: 0.95rem; }
+.home-benefit strong { font-size: 0.95rem; color: var(--azul-oscuro); }
+.home-benefit span { font-family: 0.75rem; color: var(--amarillo);}
 .home-benefit-blue > svg { color: #087eea; background: #e6f2ff; }
 .home-benefit-green > svg { color: #10a53d; background: #e5f9e9; }
 .home-benefit-purple > svg { color: #4a43df; background: #ebebff; }
@@ -2829,12 +2830,39 @@ padding-top: 80px;
     .home-destination-card { height: 175px; }
 }
 
+/* Barra de navegación en computadora */
 @media screen and (min-width: 768px) {
-  .navbar .menu-icon {
+  .nav-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    height: 4.75rem;
+    padding: 0 1.5rem;
+  }
+
+  /* Logo: izquierda */
+  .nav-logo {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+  }
+
+  .logo-app-img {
+    height: 58px;
+  }
+
+  /* Enlaces: centro */
+  .menu-nav {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0 !important;
+  }
+
+  .menu-icon {
     display: none !important;
   }
 
-  .navbar .menu-links {
+  .menu-links {
     display: flex !important;
     position: static !important;
     width: auto !important;
@@ -2842,23 +2870,33 @@ padding-top: 80px;
     margin: 0 !important;
     padding: 0 !important;
     background: transparent !important;
-    gap: 22px;
+    gap: 1.6rem;
     align-items: center;
   }
 
-  .navbar .menu-links li {
+  .menu-links li {
     list-style: none;
   }
 
-  .navbar .menu-links .menu-link {
+  .menu-links .menu-link {
     display: block;
-    padding: 8px 0 !important;
-    font-size: 16px;
+    padding: 0.55rem 0 !important;
+    color: var(--azul-oscuro);
+    font-size: 0.95rem;
     white-space: nowrap;
+    transition: color 0.2s ease, transform 0.2s ease;
   }
 
-  .navbar .menu-nav {
-    padding: 0;
+  .menu-links .menu-link:hover {
+    color: var(--celeste);
+    transform: translateY(-2px);
+  }
+
+  /* Cuenta: derecha */
+  .nav-btn-account {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: end;
   }
 }
 
