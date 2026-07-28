@@ -965,8 +965,13 @@ document.querySelectorAll('.dept-trigger').forEach(dept => {
 });
 
 // Lógica para cerrar la sección si el usuario quiere regresar al mapa general
-document.getElementById('btn-cerrar-detalle').addEventListener('click', () => {
-  document.getElementById('mapa-detalle-seccion').style.display = 'none';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-};
+const btnCerrarDetalle = document.getElementById('btn-cerrar-detalle');
+const seccionDetalle = document.getElementById('mapa-detalle-seccion');
+
+if (btnCerrarDetalle && seccionDetalle) {
+  btnCerrarDetalle.addEventListener('click', () => {
+    seccionDetalle.style.display = 'none';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+}
