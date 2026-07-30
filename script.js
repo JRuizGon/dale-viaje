@@ -1,5 +1,76 @@
-// URL Base del Backend Express que se conecta a SQLite o MongoDB
-const API_URL = 'http://localhost:3000';
+/*
+ * Cliente de Supabase. Esta aplicación es estática: no necesita Express, Node
+ * ni una clave secreta en el navegador. Configura la URL y la clave pública
+ * (publishable/anon) en supabase-config.js antes de publicarla.
+ */
+const supabaseSettings = window.SUPABASE_CONFIG || {};
+const isSupabaseConfigured = Boolean(
+    window.supabase &&
+    supabaseSettings.url &&
+    supabaseSettings.publishableKey &&
+    !supabaseSettings.url.includes('TU-PROJECT-REF') &&
+    !supabaseSettings.publishableKey.includes('TU_PUBLISHABLE_KEY')
+);
+const supabaseClient = isSupabaseConfigured
+    ? window.supabase.createClient(supabaseSettings.url, supabaseSettings.publishableKey)
+    : null;
+
+function requireSupabase() {
+    if (supabaseClient) return supabaseClient;
+    showToast('Configura Supabase en supabase-config.js para usar esta función.', 'error');
+    return null;
+}
+
+function escapeHtml(value = '') {
+    return String(value).replace(/[&<>'"]/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[character]));
+}
+
+function fileExtension(file) {
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    return /^[a-z0-9]{1,8}$/.test(extension || '') ? extension : 'jpg';
+}
+
+async function getAuthenticatedUser() {
+    if (!supabaseClient) return null;
+    const { data, error } = await supabaseClient.auth.getUser();
+    if (error) return null;
+    return data.user;
+}
+
+async function syncSessionFromSupabase() {
+    if (!supabaseClient) {
+        checkSession();
+        return null;
+    }
+
+    const authUser = await getAuthenticatedUser();
+    if (!authUser) {
+        localStorage.removeItem('viajero_session');
+        checkSession();
+        return null;
+    }
+
+    const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('username, city, avatar_url')
+        .eq('id', authUser.id)
+        .maybeSingle();
+
+    if (error) console.error('No se pudo obtener el perfil:', error);
+
+    const user = {
+        id: authUser.id,
+        email: authUser.email,
+        username: profile?.username || authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'viajero',
+        city: profile?.city || 'Granada',
+        avatar: profile?.avatar_url || ''
+    };
+    localStorage.setItem('viajero_session', JSON.stringify(user));
+    checkSession();
+    return user;
+}
 
 // Base de Datos de Ciudades Creativas con las 10 locaciones solicitadas
 const creativeCitiesData = {
@@ -975,3 +1046,212 @@ if (btnCerrarDetalle && seccionDetalle) {
   });
 }
 }
+
+/* ========================================================================
+   SUPABASE — versiones finales sin servidor Node/Express
+   ======================================================================== */
+async function renderGallery() {
+    const container = document.getElementById('gallery-render-container');
+    const client = requireSupabase();
+    if (!container || !client) return;
+    try {
+        const { data: gallery, error } = await client
+            .from('gallery')
+            .select('id, user_id, image_url, location, description, created_at, profiles(username), gallery_likes(count)')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+
+        const currentUser = await getAuthenticatedUser();
+        const ids = gallery.map(item => item.id);
+        let likedIds = new Set();
+        let savedIds = new Set();
+        if (currentUser && ids.length) {
+            const [likes, saves] = await Promise.all([
+                client.from('gallery_likes').select('gallery_id').eq('user_id', currentUser.id).in('gallery_id', ids),
+                client.from('gallery_saves').select('gallery_id').eq('user_id', currentUser.id).in('gallery_id', ids)
+            ]);
+            if (likes.error) throw likes.error;
+            if (saves.error) throw saves.error;
+            likedIds = new Set(likes.data.map(item => item.gallery_id));
+            savedIds = new Set(saves.data.map(item => item.gallery_id));
+        }
+        if (!gallery.length) {
+            container.innerHTML = '<p class="no-data-alert">Aún no hay momentos en la bitácora. ¡Sé el primero!</p>';
+            return;
+        }
+        container.innerHTML = gallery.map(item => {
+            const liked = likedIds.has(item.id);
+            const saved = savedIds.has(item.id);
+            const likes = item.gallery_likes?.[0]?.count || 0;
+            return `<article class="gallery-card">
+                <div class="card-image-wrapper"><img src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.location || 'Fotografía viajera')}" class="card-media" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800';"></div>
+                <div class="card-content"><h3>${escapeHtml(item.location || 'Destino')}</h3><p>${escapeHtml(item.description || 'Sin descripción.')}</p>
+                    <div class="card-actions-bar">
+                        <button class="action-btn like-btn ${liked ? 'active' : ''}" onclick="toggleLike(this, ${item.id})" aria-label="Me gusta"><i data-lucide="heart" ${liked ? 'style="fill:#ef4444;color:#ef4444;"' : ''}></i><span class="count-label">${likes}</span></button>
+                        <button class="action-btn save-btn ${saved ? 'active' : ''}" onclick="toggleSave(this, ${item.id})" aria-label="Guardar"><i data-lucide="bookmark" ${saved ? 'style="fill:#fbbf24;color:#fbbf24;"' : ''}></i></button>
+                    </div><div class="card-footer"><span class="explorer-tag">@${escapeHtml(item.profiles?.username || 'Explorador')}</span></div>
+                </div></article>`;
+        }).join('');
+        if (window.lucide) lucide.createIcons();
+    } catch (error) {
+        console.error('Error al cargar la galería:', error);
+        container.innerHTML = '<p class="no-data-alert" style="color:#ff4a4a;">No se pudo cargar la galería. Revisa Supabase.</p>';
+    }
+}
+
+async function toggleLike(btn, id) {
+    const client = requireSupabase();
+    const user = await getAuthenticatedUser();
+    if (!client || !user) return showToast('Inicia sesión para dar me gusta.', 'error');
+    const query = btn.classList.contains('active')
+        ? client.from('gallery_likes').delete().eq('gallery_id', id).eq('user_id', user.id)
+        : client.from('gallery_likes').insert({ gallery_id: id, user_id: user.id });
+    const { error } = await query;
+    if (error) return showToast(error.message, 'error');
+    renderGallery();
+}
+
+async function toggleSave(btn, id) {
+    const client = requireSupabase();
+    const user = await getAuthenticatedUser();
+    if (!client || !user) return showToast('Inicia sesión para guardar momentos.', 'error');
+    const saved = btn.classList.contains('active');
+    const query = saved
+        ? client.from('gallery_saves').delete().eq('gallery_id', id).eq('user_id', user.id)
+        : client.from('gallery_saves').insert({ gallery_id: id, user_id: user.id });
+    const { error } = await query;
+    if (error) return showToast(error.message, 'error');
+    showToast(saved ? 'Removido de tu colección.' : 'Momento guardado en tu colección.');
+    renderGallery();
+}
+
+async function openModal() {
+    const user = await getAuthenticatedUser();
+    if (!user) return showToast('Inicia sesión para publicar una fotografía.', 'error');
+    const modal = document.getElementById('upload-modal');
+    if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
+}
+
+function closeModal() {
+    const modal = document.getElementById('upload-modal');
+    if (modal) { modal.style.display = 'none'; modal.classList.add('hidden'); }
+}
+
+async function handleUploadSubmit(event) {
+    event.preventDefault();
+    const client = requireSupabase();
+    const user = await getAuthenticatedUser();
+    const location = document.getElementById('form-location');
+    const input = document.getElementById('form-file');
+    const description = document.getElementById('form-desc');
+    const file = input?.files?.[0];
+    if (!client || !user) return showToast('Inicia sesión para publicar una fotografía.', 'error');
+    if (!location?.value.trim() || !file) return showToast('Selecciona una imagen y escribe la ubicación.', 'error');
+    if (!file.type.startsWith('image/')) return showToast('Solo se permiten imágenes.', 'error');
+    if (file.size > 5 * 1024 * 1024) return showToast('La imagen no puede superar 5 MB.', 'error');
+    const submit = event.target.querySelector('button[type="submit"]');
+    const original = submit?.innerText;
+    try {
+        if (submit) { submit.disabled = true; submit.innerText = 'PUBLICANDO...'; }
+        const path = `${user.id}/${crypto.randomUUID()}.${fileExtension(file)}`;
+        const { error: uploadError } = await client.storage.from('gallery').upload(path, file, { contentType: file.type });
+        if (uploadError) throw uploadError;
+        const { data } = client.storage.from('gallery').getPublicUrl(path);
+        const { error: insertError } = await client.from('gallery').insert({ user_id: user.id, image_url: data.publicUrl, location: location.value.trim(), description: description?.value.trim() || '' });
+        if (insertError) throw insertError;
+        event.target.reset();
+        closeModal();
+        showToast('¡Tu momento viajero fue publicado!');
+        renderGallery();
+    } catch (error) {
+        console.error('Error al publicar:', error);
+        showToast(error.message || 'No se pudo publicar la foto.', 'error');
+    } finally {
+        if (submit) { submit.disabled = false; submit.innerText = original; }
+    }
+}
+
+async function handleRegister(event) {
+    event.preventDefault();
+    const client = requireSupabase();
+    const username = document.getElementById('reg-username')?.value.trim();
+    const email = document.getElementById('reg-email')?.value.trim();
+    const password = document.getElementById('reg-password')?.value;
+    if (!client || !username || !email || !password) return showToast('Completa todos los campos de registro.', 'error');
+    const { data, error } = await client.auth.signUp({ email, password, options: { data: { username } } });
+    if (error) return showToast(error.message, 'error');
+    event.target.reset();
+    if (data.session) {
+        await syncSessionFromSupabase();
+        showToast('¡Cuenta creada! Ya puedes explorar y publicar.');
+        navigateTo('/');
+    } else {
+        showToast('Cuenta creada. Revisa tu correo para confirmar la cuenta antes de iniciar sesión.');
+    }
+}
+
+async function handleLogin(event) {
+    event.preventDefault();
+    const client = requireSupabase();
+    const email = document.getElementById('login-email')?.value.trim();
+    const password = document.getElementById('login-password')?.value;
+    if (!client || !email || !password) return showToast('Ingresa tu correo y contraseña.', 'error');
+    const { error } = await client.auth.signInWithPassword({ email, password });
+    if (error) return showToast(error.message, 'error');
+    const user = await syncSessionFromSupabase();
+    event.target.reset();
+    showToast(`¡Bienvenido de nuevo, ${user?.username || 'viajero'}!`);
+    navigateTo('/');
+}
+
+async function handleLogout() {
+    if (supabaseClient) await supabaseClient.auth.signOut();
+    localStorage.removeItem('viajero_session');
+    checkSession();
+    showToast('Sesión terminada. ¡Vuelve pronto!');
+    navigateTo('/');
+}
+
+async function uploadAvatar() {
+    const client = requireSupabase();
+    const user = await getAuthenticatedUser();
+    const input = document.getElementById('avatar-input');
+    const file = input?.files?.[0];
+    if (!client || !user || !file) return;
+    if (!file.type.startsWith('image/')) return showToast('Selecciona una imagen válida.', 'error');
+    if (file.size > 2 * 1024 * 1024) return showToast('El avatar no puede superar 2 MB.', 'error');
+    try {
+        const path = `${user.id}/avatar.${fileExtension(file)}`;
+        const { error: uploadError } = await client.storage.from('avatars').upload(path, file, { contentType: file.type, upsert: true });
+        if (uploadError) throw uploadError;
+        const { data } = client.storage.from('avatars').getPublicUrl(path);
+        const avatarUrl = `${data.publicUrl}?v=${Date.now()}`;
+        const { error: profileError } = await client.from('profiles').update({ avatar_url: avatarUrl }).eq('id', user.id);
+        if (profileError) throw profileError;
+        await syncSessionFromSupabase();
+        showToast('¡Imagen de perfil actualizada!');
+    } catch (error) { showToast(error.message || 'No se pudo actualizar el avatar.', 'error'); }
+}
+
+async function saveProfile() {
+    const client = requireSupabase();
+    const user = await getAuthenticatedUser();
+    const username = document.getElementById('edit-username')?.value.trim();
+    const city = document.getElementById('edit-city')?.value.trim();
+    if (!client || !user || !username) return showToast('El nombre de usuario no puede quedar vacío.', 'error');
+    const { error } = await client.from('profiles').update({ username, city: city || 'Granada' }).eq('id', user.id);
+    if (error) return showToast(error.message, 'error');
+    await syncSessionFromSupabase();
+    toggleEdit();
+    showToast('¡Perfil de explorador actualizado!');
+}
+
+window.addEventListener('load', () => {
+    syncSessionFromSupabase();
+    if (supabaseClient) {
+        supabaseClient.auth.onAuthStateChange((_event, session) => {
+            if (session?.user) syncSessionFromSupabase();
+            else { localStorage.removeItem('viajero_session'); checkSession(); }
+        });
+    }
+});

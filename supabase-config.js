@@ -1,0 +1,7 @@
+/*
+ * Datos públicos del proyecto Supabase.
+ */
+window.SUPABASE_CONFIG = {
+  url: 'https://whyzqrrjmptmaxqmacvm.supabase.co',
+  publishableKey: 'sb_publishable_S05Dd2Gzj0JzazUx0-wrtA_iQmNsf30'
+};
