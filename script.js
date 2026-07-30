@@ -554,6 +554,7 @@ async function toggleSave(btn, id) {
 
 function openModal() {
     const modal = document.getElementById('upload-modal');
+
     if (modal) {
         modal.style.display = 'flex';
         modal.classList.remove('hidden');
