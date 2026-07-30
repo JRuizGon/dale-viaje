@@ -1256,3 +1256,15 @@ window.addEventListener('load', () => {
         });
     }
 });
+
+window.openModal = function () {
+  const modal = document.getElementById('upload-modal');
+
+  if (!modal) {
+    console.error('No se encontró el modal upload-modal');
+    return;
+  }
+
+  modal.classList.remove('hidden');
+  modal.style.display = 'flex';
+};
