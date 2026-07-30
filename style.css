@@ -795,7 +795,8 @@ main {
 /* VISTA: SECCIÓN UNIFICADA CIUDADES CREATIVAS & FILTROS */
 
 .creative-controls {
-    background: var(--bg-dark-card);
+    background: radial-gradient(circle at 84% 15%, rgba(0, 174, 239, 0.22), transparent 30%),
+        linear-gradient(135deg, #062e79, #031a55);
     border: 1px solid var(--borde-colonial);
     padding: 1.5rem;
     border-radius: 0.5rem;
@@ -817,7 +818,7 @@ main {
     display: block;
     font-size: 0.85rem;
     font-weight: 700;
-    color: var(--text-light);
+    color: var(--blanco);
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -830,7 +831,7 @@ main {
     border: 2px solid var(--celeste);
     background-color: var(--azul-oscuro);
     font-weight: 600;
-    color: var(--blanco); /* Corregido para visualización legible */
+    color: var(--amarillo); /* Corregido para visualización legible */
     outline: none;
     cursor: pointer;
     transition: border-color 0.2s;
@@ -849,7 +850,7 @@ main {
     border-radius: 2rem;
     font-size: 0.9rem;
     font-weight: 600;
-    color: var(--Gris);
+    color: var(--amarillo);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -858,13 +859,13 @@ main {
 }
 
 .tab-filter:hover {
-    background: var(--bg-dark-card);
-    color: var(--blanco);
+    background: var(--celeste);
+    color: var(--amarillo);
 }
 
 .tab-filter.active {
     background: var(--celeste);
-    color: var(--blanco);
+    color: var(--amarillo);
     border-color: var(--celeste);
 }
 
@@ -880,7 +881,8 @@ main {
 
 /* Tarjetas de Sitios individuales */
 .site-card {
-    background-color: var(--bg-dark-card);
+    background: radial-gradient(circle at 84% 15%, rgba(0, 174, 239, 0.22), transparent 30%),
+        linear-gradient(135deg, #062e79, #031a55);
     border-radius: 0.5rem;
     padding: 2rem;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -923,7 +925,7 @@ main {
 }
 
 .site-desc {
-    color: var(--text-light);
+    color: var(--celeste);
     line-height: 1.6;
     font-size: 0.95rem;
     margin-bottom: 1.25rem;
@@ -936,8 +938,8 @@ main {
 }
 
 .tag {
-    background-color: var(--azul-oscuro);
-    color: var(--text-light);
+    background-color: var(--celeste);
+    color: var(--amarillo);
     font-size: 0.75rem;
     font-weight: 700;
     padding: 0.3rem 0.6rem;
@@ -1421,7 +1423,8 @@ main {
 @media (min-width: 640px) { .quick-questions { grid-template-columns: repeat(2, 1fr); } }
 
 .btn-quick {
-    background-color: var(--bg-dark-card);
+    background: radial-gradient(circle at 84% 15%, rgba(0, 174, 239, 0.22), transparent 30%),
+        linear-gradient(135deg, #062e79, #031a55);;
     border: 1px solid var(--borde-colonial);
     padding: 1rem;
     border-radius: 0.5rem;
@@ -1438,7 +1441,7 @@ main {
 
 .btn-quick:hover {
     border-color: var(--celeste);
-    background-color: var(--azul-oscuro);
+    background-color: var(--celeste);
     transform: translateY(-1px);
 }
 
@@ -1478,7 +1481,8 @@ main {
 }
 
 .message.ai {
-    background-color: #060079; /* Legibilidad total en el contenedor interno */
+    background:radial-gradient(circle at 84% 15%, rgba(0, 174, 239, 0.22), transparent 30%),
+        linear-gradient(135deg, #062e79, #031a55);
     border: 1px solid var(--celeste);
     color: var(--blanco);
     align-self: flex-start;
@@ -1490,7 +1494,8 @@ main {
     border-top: 1px solid var(--borde-colonial);
     display: flex;
     gap: 0.75rem;
-    background-color: var(--bg-dark-card);
+    background: radial-gradient(circle at 84% 15%, rgba(0, 174, 239, 0.22), transparent 30%),
+        linear-gradient(135deg, #062e79, #031a55);
 }
 
 /* VISTA: REGISTRO / AUTENTICACIÓN / MI PERFIL */
@@ -1659,7 +1664,8 @@ main {
 @media (min-width: 768px) { .auth-box-layout { grid-template-columns: repeat(2, 1fr); } }
 
 .auth-card-panel {
-    background: var(--bg-dark-card); /* Ajustado: Cambiado de un 'blue' sólido para no romper el ecosistema visual */
+    background: radial-gradient(circle at 84% 15%, rgba(0, 174, 239, 0.22), transparent 30%),
+        linear-gradient(135deg, #062e79, #031a55);
     padding: 2.5rem 2rem;
     border-radius: 0.5rem;
     border: 1px solid var(--borde-colonial);
