@@ -2,7 +2,7 @@
  * Cliente de Supabase. Esta aplicación es estática: no necesita Express, Node
  * ni una clave secreta en el navegador. Configura la URL y la clave pública
  * (publishable/anon) en supabase-config.js antes de publicarla.
- */
+ */ 
 const supabaseSettings = window.SUPABASE_CONFIG || {};
 const isSupabaseConfigured = Boolean(
     window.supabase &&
@@ -34,9 +34,9 @@ function fileExtension(file) {
 
 async function getAuthenticatedUser() {
     if (!supabaseClient) return null;
-    const { data, error } = await supabaseClient.auth.getUser();
+    const { data, error } = await supabaseClient.auth.getSession();
     if (error) return null;
-    return data.user;
+    return data.session?.user ?? null;
 }
 
 async function syncSessionFromSupabase() {
@@ -552,75 +552,7 @@ async function toggleSave(btn, id) {
     }
 }
 
-function openModal() {
-    const modal = document.getElementById('upload-modal');
-
-    if (modal) {
-        modal.style.display = 'flex';
-        modal.classList.remove('hidden');
-    }
-}
-function closeModal() { document.getElementById('upload-modal')?.classList.add('hidden'); }
 function closeModalOnOverlay(e) { if (e.target.id === 'upload-modal') closeModal(); }
-
-async function handleUploadSubmit(event) {
-    event.preventDefault();
-
-    const locationInput = document.getElementById('form-location');
-    const fileInput = document.getElementById('form-file');
-    const descInput = document.getElementById('form-desc');
-
-    const session = localStorage.getItem('viajero_session');
-    const user = session ? JSON.parse(session) : null;
-
-    if (!user?.access_token) {
-        showToast('Inicia sesión para publicar una fotografía.', 'error');
-        return;
-    }
-
-    if (!locationInput || !fileInput || !fileInput.files[0]) {
-        showToast('Selecciona una imagen y escribe la ubicación.', 'error');
-        return;
-    }
-
-    const btnSubmit = event.target.querySelector('button[type="submit"]');
-    const textoOriginal = btnSubmit.innerText;
-
-    try {
-        btnSubmit.innerText = 'SUBIENDO FOTO...';
-        btnSubmit.disabled = true;
-
-        const formData = new FormData();
-        formData.append('image', fileInput.files[0]);
-        formData.append('location', locationInput.value.trim());
-        formData.append('description', descInput.value.trim());
-
-        const response = await fetch(`${API_URL}/api/upload`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${user.access_token}`
-            },
-            body: formData
-        });
-
-        const data = await response.json();
-
-        if (response.ok && data.success) {
-            showToast('¡Tu momento viajero fue publicado!');
-            event.target.reset();
-            closeModal();
-            renderGallery();
-        } else {
-            showToast(data.error || 'No se pudo publicar la foto.', 'error');
-        }
-    } catch (error) {
-        console.error(error);
-        showToast('Error de comunicación con el servidor.', 'error');
-    } finally {
-        btnSubmit.innerText = textoOriginal;
-        btnSubmit.disabled = false;
-    }
-}
 
 /* ==========================================================================
     NUEVO DISPARADOR CENTRALIZADO DE SESIÓN (SOLUCIONA TU BUG DE NAVEGACIÓN)
@@ -1126,11 +1058,22 @@ async function toggleSave(btn, id) {
     renderGallery();
 }
 
-async function openModal() {
-    const user = await getAuthenticatedUser();
-    if (!user) return showToast('Inicia sesión para publicar una fotografía.', 'error');
+function openModal() {
     const modal = document.getElementById('upload-modal');
-    if (modal) { modal.style.display = 'flex'; modal.classList.remove('hidden'); }
+    if (!modal) return;
+
+    // Abrir de inmediato: no esperamos a la verificación de sesión para que
+    // el clic se sienta instantáneo.
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+
+    getAuthenticatedUser().then(user => {
+        if (!user) {
+            closeModal();
+            showToast('Inicia sesión o regístrate para publicar una fotografía.', 'error');
+            navigateTo('/registro');
+        }
+    });
 }
 
 function closeModal() {
@@ -1256,15 +1199,3 @@ window.addEventListener('load', () => {
         });
     }
 });
-
-window.openModal = function () {
-  const modal = document.getElementById('upload-modal');
-
-  if (!modal) {
-    console.error('No se encontró el modal upload-modal');
-    return;
-  }
-
-  modal.classList.remove('hidden');
-  modal.style.display = 'flex';
-};

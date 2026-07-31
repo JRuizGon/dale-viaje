@@ -99,7 +99,7 @@
             <img src="img/logo.png" alt="Logo KALI" class="logo-app-img"> 
         </a>
 
-  <a onclick="navigateTo('/registro')" class="registro nav-btn-account" id="link-auth">
+  <a onclick="navigateTo('/registro')" class="nav-btn-account" id="link-auth">
                 <i data-lucide="user-circle" style="width: 1.1rem; height: 1.1rem; display: inline-block; vertical-align: middle;"></i> 
                 <span id="nav-auth-text">Registro</span>
   </a>
@@ -372,7 +372,7 @@
                             <h1>Galería Viajera</h1>
                             <p>Momentos capturados por exploradores en toda Nicaragua</p>
                         </div>
-                        <button type="button" class="btn-open-upload" onclick="openModal()">
+                        <button type="button" class="btn-open-upload" onclick="window.openModal()">
                         <i data-lucide="plus-circle"></i> Compartir Momento
                         </button>
                     </div>
@@ -540,8 +540,11 @@
 
         </main>
     </div>
+</div>
 
-   <div id="upload-modal" onclick="closeModalOnOverlay(event)">
+<!-- El modal vive fuera de cualquier .view para que nunca quede oculto
+     por el display:none que navigateTo() aplica a las vistas -->
+<div id="upload-modal" onclick="closeModalOnOverlay(event)">
     <div class="modal-content">
         <button class="btn-close-modal" onclick="closeModal()">×</button>
         
@@ -574,10 +577,9 @@
                 <textarea id="form-desc" class="custom-textarea" rows="3" required placeholder="Contanos qué tal te pareció..."></textarea>
             </div>
 
-            <button type="submit" class="btn-auth">PUBLICAR EN GALERÍA</button>
+            <button type="submit" class="btn-open-upload">PUBLICAR EN GALERÍA</button>
         </form>
     </div>
-</div>
 </div>
     <script src="supabase-config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

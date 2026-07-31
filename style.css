@@ -388,9 +388,6 @@ background: #ffffff95;
   font-weight: bold;
 }
 
-.registro{
-    float: right;
-}
 
 .nav-btn-account {
     background-color: rgba(242, 244, 246, 0.08);
@@ -2160,8 +2157,6 @@ padding-top: 80px;
         line-height: 1.5;
     }
 
-    .btn-map-start,
-    .btn-auth,
     .btn-auth-secondary {
         width: 100%;
         min-height: 48px;
@@ -2386,9 +2381,27 @@ padding-top: 80px;
     }
 
     /* MODALES */
-    #upload-modal {
-        padding: 0.75rem;
-    }
+    /* MODAL */
+#upload-modal{
+    position: fixed;
+    inset: 0;
+    display: none;              /* oculto al inicio */
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,.65);
+    z-index: 99999;             /* MUY IMPORTANTE */
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .25s ease;
+    pointer-events: none;
+}
+
+/* Cuando se abre */
+#upload-modal:not(.hidden){
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
 
     .modal-content,
     .modal-card {
