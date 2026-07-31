@@ -1,8 +1,3 @@
-/*
- * Cliente de Supabase. Esta aplicación es estática: no necesita Express, Node
- * ni una clave secreta en el navegador. Configura la URL y la clave pública
- * (publishable/anon) en supabase-config.js antes de publicarla.
- */ 
 const supabaseSettings = window.SUPABASE_CONFIG || {};
 const isSupabaseConfigured = Boolean(
     window.supabase &&
