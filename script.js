@@ -561,9 +561,8 @@ async function toggleSave(btn, id) {
 
 function closeModalOnOverlay(e) { if (e.target.id === 'upload-modal') closeModal(); }
 
-/* ==========================================================================
-    NUEVO DISPARADOR CENTRALIZADO DE SESIÓN (SOLUCIONA TU BUG DE NAVEGACIÓN)
-   ========================================================================== */
+/* NUEVO DISPARADOR CENTRALIZADO DE SESIÓN*/
+
 function checkSession() {
     const session = localStorage.getItem('viajero_session');
     const formsContainer = document.getElementById('auth-forms-container');
@@ -604,9 +603,7 @@ function checkSession() {
     }
 }
 
-/* ==========================================================================
-    CONTROLADORES DE AUTENTICACIÓN ADAPTADOS A LOS IDs DEL HTML
-   ========================================================================== */
+/* CONTROLADORES DE AUTENTICACIÓN ADAPTADOS A LOS IDs DEL HTML */
 
 async function handleRegister(event) {
     event.preventDefault();
@@ -735,9 +732,7 @@ function actualizarCajaPerfilInterfaz(user) {
         }
     }
 }
-/* ==========================================================================
-    CAMBIO DINÁMICO Y PERSISTENCIA DEL AVATAR / LOGO DE PERFIL
-   ========================================================================== */
+/*  CAMBIO DINÁMICO Y PERSISTENCIA DEL AVATAR / LOGO DE PERFIL */
 
 function uploadAvatar() {
     const fileInput = document.getElementById('avatar-input');
@@ -892,7 +887,7 @@ function sendUserMessage() {
         const aiMsg = document.createElement('div');
         aiMsg.className = 'message ai';
         aiMsg.innerHTML = `
-            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> Guía IA Pinolero</div>
+            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
             <div class="ai-body"></div>
         `;
         aiMsg.querySelector('.ai-body').innerHTML = aiText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); 
