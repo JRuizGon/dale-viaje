@@ -262,22 +262,34 @@ function showToast(message, type = 'success') {
 
     const toast = document.createElement('div');
     toast.className = `toast-card ${type}`;
-    const icon = type === 'success' ? '🎉' : '❌';
 
+    const icon = type === 'success' ? '🎉' : '❌';
+    
+    // Agregamos el HTML del botón de cierre (toast-close)
     toast.innerHTML = `
         <span class="toast-icon">${icon}</span>
         <span class="toast-message">${message}</span>
+        <button class="toast-close" aria-label="Cerrar">&times;</button>
     `;
 
     container.appendChild(toast);
 
-    setTimeout(() => {
+    // Función interna para la animación de salida
+    const triggerFadeOut = () => {
         toast.classList.add('fade-out');
         toast.addEventListener('transitionend', () => {
             toast.remove();
         });
-    }, 4000);
+    };
+
+    // Evento de clic específico para el botón "X"
+    const closeButton = toast.querySelector('.toast-close');
+    closeButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        triggerFadeOut();
+    });
 }
+
 
 function navigateTo(viewId) {
     document.querySelectorAll('.view').forEach(v => {

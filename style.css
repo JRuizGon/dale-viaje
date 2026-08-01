@@ -271,9 +271,8 @@ p {
     transition: opacity 0.5s ease-in-out;
 }
 
-/* ==========================================================================
-   ESTRUCTURA DE NAVEGACIÓN Y NAVBAR (CORREGIDA)
-   ========================================================================== */
+/* ESTRUCTURA DE NAVEGACIÓN Y NAVBAR */
+
 .navbar {
     background-color: var(--bg-dark-card);
     border: 20px var(--celeste);
@@ -475,9 +474,8 @@ main {
     margin-top: 0.25rem;
 }
 
-/* ==========================================================================
-   VISTA: HOME (INICIO) - BANNER PERSONALIZADO
-   ========================================================================== */
+/* VISTA: HOME (INICIO) - BANNER PERSONALIZADO */
+
 .hero {
     padding: 10rem 2rem;
     text-align: center;
@@ -611,9 +609,7 @@ main {
     color: #cbd5e1;
 }
 
-/* ==========================================================================
-   VISTA: MAPA INTERACTIVO
-   ========================================================================== */
+/* VISTA: MAPA INTERACTIVO */
 
    .map-interactive-wrapper {
     position: relative;
@@ -1767,6 +1763,30 @@ main {
     transition: all 0.3s ease;
 }
 
+/* Clase que activa la animación de salida */
+.toast-card.fade-out {
+    opacity: 0;
+    transform: translateX(50px); /* Se desplaza sutilmente a la derecha mientras desaparece */
+    pointer-events: none; /* Evita que el usuario interactúe con el elemento fantasma */
+}
+
+/* Estilos para el botón X */
+.toast-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    line-height: 1;
+    color: #999;
+    cursor: pointer;
+    margin-left: auto; /* Empuja el botón completamente a la derecha */
+    padding: 0 4px;
+    transition: color 0.2s;
+}
+
+.toast-close:hover {
+    color: #333;
+}
+
 /* Variación según el tipo de mensaje */
 .toast-card.cian-vivido {
     border-left: 4px solid #10b981; /* Verde esmeralda para éxitos */
@@ -1782,12 +1802,6 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-/* Animación de desaparición progresiva (controlada por JS) */
-.toast-card.fade-out {
-    opacity: 0;
-    transform: translateX(100px) scale(0.9);
 }
 
 @keyframes toastIn {
@@ -3077,4 +3091,279 @@ padding-top: 80px;
   .mapa-ciudades iframe {
     height: 260px !important;
   }
+}
+/* ==========================================================================
+   REDISEÑO DE PÁGINAS DE CIUDAD (ciudades.html)
+   Clases nuevas y aisladas — no tocan el CSS viejo de .ciudades-style
+   para no romper nada que ya funcionaba.
+   ========================================================================== */
+
+.city-hero {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.75rem;
+    padding: 5rem 1.25rem 3rem;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.city-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(1, 21, 133, 0.55) 0%, rgba(1, 10, 40, 0.88) 75%, rgba(1, 8, 30, 0.96) 100%);
+    z-index: 0;
+}
+
+.city-hero-card {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    width: 100%;
+    background: rgba(10, 20, 45, 0.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 28px;
+    padding: 2.5rem 2.25rem;
+    text-align: center;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45);
+}
+
+.city-hero-card h1 {
+    font-size: clamp(2.1rem, 6vw, 3.1rem);
+    color: var(--amarillo);
+    font-weight: 900;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 18px rgba(0,0,0,0.35);
+}
+
+.city-hero-card p {
+    color: rgba(255, 255, 255, 0.92);
+    line-height: 1.75;
+    font-size: 1rem;
+}
+
+.city-highlights {
+    position: relative;
+    z-index: 1;
+    max-width: 880px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 1rem;
+}
+
+.highlight-feature {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    min-height: 150px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.highlight-feature::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 25%, rgba(3, 8, 25, 0.85) 100%);
+}
+
+.highlight-feature-content {
+    position: relative;
+    z-index: 1;
+    padding: 1.1rem;
+    width: 100%;
+}
+
+.highlight-feature-content h3 {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.3px;
+}
+
+.highlight-feature-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--amarillo);
+    color: #201400;
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.4px;
+    padding: 0.5rem 0.9rem;
+    border-radius: 10px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+}
+
+.highlight-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    justify-content: center;
+}
+
+.highlight-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.82rem;
+    line-height: 1.25;
+    flex: 1;
+}
+
+.highlight-chip svg {
+    width: 1.35rem;
+    height: 1.35rem;
+    color: var(--amarillo);
+    flex-shrink: 0;
+}
+
+.city-section-title {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 0.75rem;
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: 0.3px;
+}
+
+.city-section-title span {
+    color: var(--amarillo);
+}
+
+.city-content-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 3rem;
+}
+
+.multimedia-panel,
+.map-panel {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 1.5rem;
+}
+
+.multimedia-panel h2,
+.map-panel h2 {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.multimedia-panel h2 svg,
+.map-panel h2 svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: var(--amarillo);
+}
+
+.multimedia-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.7rem;
+}
+
+.multimedia-grid figure {
+    position: relative;
+    margin: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    height: 130px;
+}
+
+.multimedia-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.35s ease;
+}
+
+.multimedia-grid figure:hover img {
+    transform: scale(1.08);
+}
+
+.multimedia-grid figcaption {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.75));
+}
+
+.map-panel .map-frame-wrap {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.map-panel iframe {
+    width: 100%;
+    height: 300px;
+    border: 0;
+    display: block;
+}
+
+.city-subgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+    .city-highlights,
+    .city-content-grid,
+    .city-subgrid {
+        grid-template-columns: 1fr;
+    }
+    .city-hero {
+        padding: 4.5rem 1rem 2.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .multimedia-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .multimedia-grid figure {
+        height: 100px;
+    }
 }
