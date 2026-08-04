@@ -262,34 +262,22 @@ function showToast(message, type = 'success') {
 
     const toast = document.createElement('div');
     toast.className = `toast-card ${type}`;
-
     const icon = type === 'success' ? '🎉' : '❌';
-    
-    // Agregamos el HTML del botón de cierre (toast-close)
+
     toast.innerHTML = `
         <span class="toast-icon">${icon}</span>
         <span class="toast-message">${message}</span>
-        <button class="toast-close" aria-label="Cerrar">&times;</button>
     `;
 
     container.appendChild(toast);
 
-    // Función interna para la animación de salida
-    const triggerFadeOut = () => {
+    setTimeout(() => {
         toast.classList.add('fade-out');
         toast.addEventListener('transitionend', () => {
             toast.remove();
         });
-    };
-
-    // Evento de clic específico para el botón "X"
-    const closeButton = toast.querySelector('.toast-close');
-    closeButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        triggerFadeOut();
-    });
+    }, 4000);
 }
-
 
 function navigateTo(viewId) {
     document.querySelectorAll('.view').forEach(v => {
@@ -366,6 +354,7 @@ function navigateTo(viewId) {
     }
 
     if(viewId === '/galeria') renderGallery();
+    if(viewId === '/ciudades-creativas') filterCreativeSites();
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
@@ -561,8 +550,9 @@ async function toggleSave(btn, id) {
 
 function closeModalOnOverlay(e) { if (e.target.id === 'upload-modal') closeModal(); }
 
-/* NUEVO DISPARADOR CENTRALIZADO DE SESIÓN*/
-
+/* ==========================================================================
+    NUEVO DISPARADOR CENTRALIZADO DE SESIÓN (SOLUCIONA TU BUG DE NAVEGACIÓN)
+   ========================================================================== */
 function checkSession() {
     const session = localStorage.getItem('viajero_session');
     const formsContainer = document.getElementById('auth-forms-container');
@@ -603,7 +593,9 @@ function checkSession() {
     }
 }
 
-/* CONTROLADORES DE AUTENTICACIÓN ADAPTADOS A LOS IDs DEL HTML */
+/* ==========================================================================
+    CONTROLADORES DE AUTENTICACIÓN ADAPTADOS A LOS IDs DEL HTML
+   ========================================================================== */
 
 async function handleRegister(event) {
     event.preventDefault();
@@ -732,7 +724,9 @@ function actualizarCajaPerfilInterfaz(user) {
         }
     }
 }
-/*  CAMBIO DINÁMICO Y PERSISTENCIA DEL AVATAR / LOGO DE PERFIL */
+/* ==========================================================================
+    CAMBIO DINÁMICO Y PERSISTENCIA DEL AVATAR / LOGO DE PERFIL
+   ========================================================================== */
 
 function uploadAvatar() {
     const fileInput = document.getElementById('avatar-input');
@@ -887,7 +881,7 @@ function sendUserMessage() {
         const aiMsg = document.createElement('div');
         aiMsg.className = 'message ai';
         aiMsg.innerHTML = `
-            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
+            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> Guía IA Pinolero</div>
             <div class="ai-body"></div>
         `;
         aiMsg.querySelector('.ai-body').innerHTML = aiText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); 

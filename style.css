@@ -271,8 +271,9 @@ p {
     transition: opacity 0.5s ease-in-out;
 }
 
-/* ESTRUCTURA DE NAVEGACIÓN Y NAVBAR */
-
+/* ==========================================================================
+   ESTRUCTURA DE NAVEGACIÓN Y NAVBAR (CORREGIDA)
+   ========================================================================== */
 .navbar {
     background-color: var(--bg-dark-card);
     border: 20px var(--celeste);
@@ -350,19 +351,25 @@ p {
 
 /* Ocultar los enlaces en móvil por defecto */
 .menu-links {
-  display: none;
+  display: flex;
+  flex-direction: column;
   position: fixed;
   top: 0;
   left: 0;
   bottom: 0;
-  width: 50%;
+  width: min(78%, 320px);
   z-index: 1000;
 
   font-size: 20px;
   list-style: none;
   margin: 0;
   padding: 90px 30px 30px;
-background: #ffffff95;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.35);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
 }
 
 .menu-links:hover, .menu-links.active {
@@ -371,11 +378,32 @@ background: #ffffff95;
 
 .menu-links li {
   list-style: none;
+  border-bottom: 1px solid rgba(1, 21, 133, 0.08);
+}
+
+.menu-links li:last-child {
+  border-bottom: none;
 }
 
 /* Mostrar el menú cuando el checkbox está seleccionado */
 #menu-toggle:checked ~ .menu-links {
-  display: block;
+  transform: translateX(0);
+}
+
+/* Overlay oscuro detrás del menú para separarlo del contenido */
+.menu-nav::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(1, 8, 30, 0.5);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.menu-nav:has(#menu-toggle:checked)::before {
+  opacity: 1;
 }
 
 .menu-link {
@@ -474,8 +502,9 @@ main {
     margin-top: 0.25rem;
 }
 
-/* VISTA: HOME (INICIO) - BANNER PERSONALIZADO */
-
+/* ==========================================================================
+   VISTA: HOME (INICIO) - BANNER PERSONALIZADO
+   ========================================================================== */
 .hero {
     padding: 10rem 2rem;
     text-align: center;
@@ -609,7 +638,9 @@ main {
     color: #cbd5e1;
 }
 
-/* VISTA: MAPA INTERACTIVO */
+/* ==========================================================================
+   VISTA: MAPA INTERACTIVO
+   ========================================================================== */
 
    .map-interactive-wrapper {
     position: relative;
@@ -1763,30 +1794,6 @@ main {
     transition: all 0.3s ease;
 }
 
-/* Clase que activa la animación de salida */
-.toast-card.fade-out {
-    opacity: 0;
-    transform: translateX(50px); /* Se desplaza sutilmente a la derecha mientras desaparece */
-    pointer-events: none; /* Evita que el usuario interactúe con el elemento fantasma */
-}
-
-/* Estilos para el botón X */
-.toast-close {
-    background: none;
-    border: none;
-    font-size: 20px;
-    line-height: 1;
-    color: #999;
-    cursor: pointer;
-    margin-left: auto; /* Empuja el botón completamente a la derecha */
-    padding: 0 4px;
-    transition: color 0.2s;
-}
-
-.toast-close:hover {
-    color: #333;
-}
-
 /* Variación según el tipo de mensaje */
 .toast-card.cian-vivido {
     border-left: 4px solid #10b981; /* Verde esmeralda para éxitos */
@@ -1802,6 +1809,12 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Animación de desaparición progresiva (controlada por JS) */
+.toast-card.fade-out {
+    opacity: 0;
+    transform: translateX(100px) scale(0.9);
 }
 
 @keyframes toastIn {
@@ -2897,18 +2910,27 @@ padding-top: 80px;
 
   .menu-links {
     display: flex !important;
+    flex-direction: row !important;
     position: static !important;
     width: auto !important;
     height: auto !important;
     margin: 0 !important;
     padding: 0 !important;
     background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    transform: none !important;
     gap: 1.6rem;
     align-items: center;
   }
 
   .menu-links li {
     list-style: none;
+    border-bottom: none !important;
+  }
+
+  .menu-nav::before {
+    content: none !important;
   }
 
   .menu-links .menu-link {
