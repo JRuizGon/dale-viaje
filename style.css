@@ -271,9 +271,9 @@ p {
     transition: opacity 0.5s ease-in-out;
 }
 
-/*
+/* ==========================================================================
    ESTRUCTURA DE NAVEGACIÓN Y NAVBAR (CORREGIDA)
- */
+   ========================================================================== */
 .navbar {
     background-color: var(--bg-dark-card);
     border: 20px var(--celeste);
@@ -502,9 +502,9 @@ main {
     margin-top: 0.25rem;
 }
 
-/*
+/* ==========================================================================
    VISTA: HOME (INICIO) - BANNER PERSONALIZADO
- */
+   ========================================================================== */
 .hero {
     padding: 10rem 2rem;
     text-align: center;
@@ -638,9 +638,9 @@ main {
     color: #cbd5e1;
 }
 
-/*
+/* ==========================================================================
    VISTA: MAPA INTERACTIVO
- */
+   ========================================================================== */
 
    .map-interactive-wrapper {
     position: relative;
@@ -1811,6 +1811,28 @@ main {
     justify-content: center;
 }
 
+.toast-message {
+    flex: 1;
+}
+
+.toast-close {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.15rem 0.35rem;
+    border-radius: 6px;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.toast-close:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
 /* Animación de desaparición progresiva (controlada por JS) */
 .toast-card.fade-out {
     opacity: 0;
@@ -2153,8 +2175,8 @@ padding-top: 80px;
     }
 
     .guardabarranco-container {
-        width: 180px;
-        height: 180px;
+        width: 120px;
+        height: 120px;
     }
 
     .loader {
@@ -2609,9 +2631,9 @@ padding-top: 80px;
     }
 }
 
-/* 
+/* ========================================================================== 
    INICIO: RUTAS PINOLERAS
- */
+   ========================================================================== */
 .home-showcase {
     max-width: 1510px;
     margin: 0 auto;
@@ -2962,7 +2984,7 @@ padding-top: 80px;
   }
 }
 
-/*  DISEÑO MODERNO: PÁGINAS DE CIUDADES  */
+/* ===== DISEÑO MODERNO: PÁGINAS DE CIUDADES ===== */
 
 .ciudades-style {
   width: min(1180px, calc(100% - 2rem));
@@ -3391,4 +3413,179 @@ padding-top: 80px;
     .multimedia-grid figure {
         height: 100px;
     }
+}
+/* ==========================================================================
+   PLAN DE PAGO, TOKENS DE YAPTI Y "AGREGAR LOCAL"
+   ========================================================================== */
+
+/* Los modales nuevos reutilizan el mismo mecanismo que #upload-modal */
+#plan-modal,
+#add-local-modal {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Botón "Agregar Local" en el header de Ciudades Creativas */
+.btn-add-local {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.75rem 1.4rem;
+    background: var(--amarillo, #FBBF24);
+    color: #201400;
+    font-weight: 800;
+    font-size: 0.9rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-add-local:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(251, 191, 36, 0.35);
+}
+
+.btn-add-local svg {
+    width: 1.1rem;
+    height: 1.1rem;
+}
+
+/* Badge de "Negocio Local" dentro de las tarjetas de sitios */
+.badge-local {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--amarillo, #FBBF24);
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+/* Badge de tokens / plan en YAPTI */
+.yapti-tokens-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.9rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.yapti-tokens-badge svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--amarillo, #FBBF24);
+}
+
+.yapti-tokens-badge.plan-active {
+    background: rgba(251, 191, 36, 0.15);
+    border-color: rgba(251, 191, 36, 0.4);
+    color: var(--amarillo, #FBBF24);
+}
+
+/* Contenido del modal de plan */
+.plan-modal-content {
+    text-align: center;
+}
+
+.plan-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(251, 191, 36, 0.15);
+    color: var(--amarillo, #FBBF24);
+    font-weight: 800;
+    font-size: 0.78rem;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    margin-bottom: 1rem;
+}
+
+.plan-badge svg { width: 1rem; height: 1rem; }
+
+.plan-modal-reason {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+}
+
+.plan-benefits {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.plan-benefits li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: #e2e8f0;
+    font-size: 0.92rem;
+}
+
+.plan-benefits svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    color: #10b981;
+    flex-shrink: 0;
+}
+
+.plan-price {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 1.25rem;
+}
+
+.plan-price span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #94a3b8;
+}
+
+.btn-buy-plan {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--amarillo, #FBBF24);
+    color: #201400;
+    font-weight: 800;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+
+.btn-buy-plan:hover { transform: translateY(-2px); }
+.btn-buy-plan:disabled { opacity: 0.7; cursor: default; transform: none; }
+
+.plan-disclaimer {
+    margin-top: 0.9rem;
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+@media (max-width: 640px) {
+    .btn-add-local { width: 100%; justify-content: center; }
 }

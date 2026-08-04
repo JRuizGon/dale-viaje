@@ -49,7 +49,7 @@ async function syncSessionFromSupabase() {
 
     const { data: profile, error } = await supabaseClient
         .from('profiles')
-        .select('username, city, avatar_url')
+        .select('username, city, avatar_url, has_plan, yapti_tokens')
         .eq('id', authUser.id)
         .maybeSingle();
 
@@ -60,7 +60,9 @@ async function syncSessionFromSupabase() {
         email: authUser.email,
         username: profile?.username || authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'viajero',
         city: profile?.city || 'Granada',
-        avatar: profile?.avatar_url || ''
+        avatar: profile?.avatar_url || '',
+        hasPlan: Boolean(profile?.has_plan),
+        yaptiTokens: profile?.yapti_tokens ?? YAPTI_FREE_TOKENS
     };
     localStorage.setItem('viajero_session', JSON.stringify(user));
     checkSession();
@@ -267,16 +269,28 @@ function showToast(message, type = 'success') {
     toast.innerHTML = `
         <span class="toast-icon">${icon}</span>
         <span class="toast-message">${message}</span>
+        <button type="button" class="toast-close" aria-label="Cerrar notificación">×</button>
     `;
 
     container.appendChild(toast);
 
-    setTimeout(() => {
+    let dismissed = false;
+    const dismiss = () => {
+        if (dismissed) return;
+        dismissed = true;
+        clearTimeout(autoTimer);
         toast.classList.add('fade-out');
         toast.addEventListener('transitionend', () => {
             toast.remove();
-        });
-    }, 4000);
+        }, { once: true });
+        // Respaldo por si transitionend no dispara (p.ej. pestaña en segundo plano)
+        setTimeout(() => toast.remove(), 350);
+    };
+
+    // Se cierra sola a los 3 segundos...
+    const autoTimer = setTimeout(dismiss, 3000);
+    // ...pero también se puede cerrar antes con la "x".
+    toast.querySelector('.toast-close').addEventListener('click', dismiss);
 }
 
 function navigateTo(viewId) {
@@ -355,6 +369,7 @@ function navigateTo(viewId) {
 
     if(viewId === '/galeria') renderGallery();
     if(viewId === '/ciudades-creativas') filterCreativeSites();
+    if(viewId === '/ia-guia') renderYaptiPlanStatus();
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
@@ -388,18 +403,40 @@ function changeCategoryFilter(category) {
     filterCreativeSites();
 }
 
-function filterCreativeSites() {
+async function filterCreativeSites() {
     const selectCityElem = document.getElementById('select-city');
     if (!selectCityElem) return;
 
     const selectedCity = selectCityElem.value;
     const container = document.getElementById('sites-render-container');
     if (!container) return;
-    
+
     container.innerHTML = '';
     const sites = creativeCitiesData[selectedCity] || [];
-    
-    const filteredSites = sites.filter(site => {
+
+    // Locales agregados por usuarios (requiere el Plan Viajero para publicarse)
+    let locales = [];
+    if (supabaseClient) {
+        const { data, error } = await supabaseClient
+            .from('locales_negocio')
+            .select('nombre, categoria, descripcion, ciudad')
+            .eq('ciudad', selectedCity);
+        if (error) {
+            console.error('No se pudieron cargar los locales de la comunidad:', error);
+        } else {
+            locales = (data || []).map(local => ({
+                name: local.nombre,
+                category: local.categoria,
+                desc: local.descripcion,
+                rating: null,
+                visitors: null,
+                highlights: [],
+                esLocalComunidad: true
+            }));
+        }
+    }
+
+    const filteredSites = [...sites, ...locales].filter(site => {
         if (currentCategoryFilter === 'todos') return true;
         return site.category === currentCategoryFilter;
     });
@@ -417,15 +454,19 @@ function filterCreativeSites() {
         const card = document.createElement('div');
         card.className = `site-card border-${site.category}`;
         let tagsHTML = '';
-        site.highlights.forEach(h => { tagsHTML += `<span class="tag">${h}</span>`; });
+        (site.highlights || []).forEach(h => { tagsHTML += `<span class="tag">${h}</span>`; });
 
-        card.innerHTML = `
-            <div class="site-title">${site.name} <span class="badge-cat">${site.category.toUpperCase()}</span></div>
-            <div class="site-meta">
+        const metaHTML = site.esLocalComunidad
+            ? `<span class="badge-local"><i data-lucide="store" style="width: 1rem; height: 1rem;"></i> Negocio Local</span>`
+            : `
                 <span class="rating"><i data-lucide="star" style="width: 1rem; height: 1rem; fill: currentColor;"></i> ${site.rating}</span>
                 <span class="visitors"><i data-lucide="users" style="width: 1rem; height: 1rem;"></i> ${site.visitors}</span>
-            </div>
-            <div class="site-desc">${site.desc}</div>
+            `;
+
+        card.innerHTML = `
+            <div class="site-title">${escapeHtml(site.name)} <span class="badge-cat">${site.category.toUpperCase()}</span></div>
+            <div class="site-meta">${metaHTML}</div>
+            <div class="site-desc">${escapeHtml(site.desc)}</div>
             <div class="highlights">${tagsHTML}</div>
         `;
         container.appendChild(card);
@@ -594,8 +635,230 @@ function checkSession() {
 }
 
 /* ==========================================================================
-    CONTROLADORES DE AUTENTICACIÓN ADAPTADOS A LOS IDs DEL HTML
+    PLAN DE PAGO (SIMULADO), TOKENS DE YAPTI Y "AGREGAR LOCAL"
+    ------------------------------------------------------------------------
+    IMPORTANTE: Esta app no tiene conectada una pasarela de pago real
+    (Stripe, PayPal, etc.). La función purchasePlanSimulated() simula el
+    cobro y activa el plan directamente en la base de datos, para que todo
+    el flujo (UI, bloqueos, desbloqueos) funcione de punta a punta. Cuando
+    tengas un proveedor de pagos real, esa es la única función que hay que
+    reemplazar por la llamada de checkout real + un webhook que confirme el
+    pago antes de poner has_plan en true.
    ========================================================================== */
+
+const YAPTI_FREE_TOKENS = 5; // Preguntas gratis para quien no tiene el plan
+
+// --- Estado del plan / tokens del usuario actual ---
+async function getUserPlanState() {
+    const user = await getAuthenticatedUser();
+
+    if (!user) {
+        // Invitado (no ha iniciado sesión): tokens contados en este navegador
+        const used = parseInt(localStorage.getItem('yapti_tokens_anon_used') || '0', 10);
+        return {
+            loggedIn: false,
+            hasPlan: false,
+            tokensRemaining: Math.max(0, YAPTI_FREE_TOKENS - used)
+        };
+    }
+
+    const { data: profile, error } = await supabaseClient
+        .from('profiles')
+        .select('has_plan, yapti_tokens')
+        .eq('id', user.id)
+        .maybeSingle();
+
+    if (error) console.error('No se pudo leer el plan del usuario:', error);
+
+    return {
+        loggedIn: true,
+        userId: user.id,
+        hasPlan: Boolean(profile?.has_plan),
+        tokensRemaining: profile?.yapti_tokens ?? YAPTI_FREE_TOKENS
+    };
+}
+
+// --- Modal "Necesitas el plan" ---
+function openPlanModal(reason) {
+    const modal = document.getElementById('plan-modal');
+    if (!modal) return;
+
+    const reasonText = document.getElementById('plan-modal-reason');
+    if (reasonText) {
+        reasonText.textContent = reason === 'yapti'
+            ? 'Se te acabaron las preguntas gratis a YAPTI. Con el plan tenés preguntas ilimitadas.'
+            : 'Agregar tu local a Ciudades Creativas es un beneficio del Plan Viajero.';
+    }
+
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+}
+
+function closePlanModal() {
+    const modal = document.getElementById('plan-modal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+}
+
+async function purchasePlanSimulated() {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+        showToast('Inicia sesión para comprar el plan.', 'error');
+        closePlanModal();
+        navigateTo('/registro');
+        return;
+    }
+
+    const btn = document.getElementById('plan-buy-btn');
+    const textoOriginal = btn ? btn.innerText : '';
+    if (btn) { btn.disabled = true; btn.innerText = 'Procesando pago...'; }
+
+    // Simulación de una pasarela de pago (ver nota arriba del módulo).
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
+    const { error } = await supabaseClient
+        .from('profiles')
+        .update({ has_plan: true })
+        .eq('id', user.id);
+
+    if (btn) { btn.disabled = false; btn.innerText = textoOriginal; }
+
+    if (error) {
+        console.error(error);
+        showToast('No se pudo activar el plan. Intenta de nuevo.', 'error');
+        return;
+    }
+
+    showToast('¡Listo! Tu Plan Viajero está activo.');
+    closePlanModal();
+
+    // Refrescar cualquier parte de la interfaz que dependa del plan
+    renderYaptiPlanStatus();
+    if (document.getElementById('view-sites')?.classList.contains('active')) {
+        filterCreativeSites();
+    }
+}
+
+// --- Tokens de YAPTI ---
+function renderYaptiPlanStatus() {
+    getUserPlanState().then(state => {
+        const badge = document.getElementById('yapti-tokens-badge');
+        if (!badge) return;
+
+        if (state.hasPlan) {
+            badge.innerHTML = `<i data-lucide="sparkles"></i> Plan Viajero: preguntas ilimitadas`;
+            badge.classList.add('plan-active');
+        } else {
+            badge.innerHTML = `<i data-lucide="zap"></i> Tokens disponibles: ${state.tokensRemaining}`;
+            badge.classList.remove('plan-active');
+        }
+        if (window.lucide) lucide.createIcons();
+    });
+}
+
+// Descuenta un token antes de dejar preguntar a YAPTI.
+// Devuelve true si puede continuar, false si hay que bloquear la pregunta.
+async function consumeYaptiToken() {
+    const state = await getUserPlanState();
+
+    if (state.hasPlan) return true;
+
+    if (state.tokensRemaining <= 0) {
+        openPlanModal('yapti');
+        return false;
+    }
+
+    if (state.loggedIn) {
+        const { error } = await supabaseClient
+            .from('profiles')
+            .update({ yapti_tokens: state.tokensRemaining - 1 })
+            .eq('id', state.userId);
+        if (error) console.error('No se pudo descontar el token:', error);
+    } else {
+        const used = parseInt(localStorage.getItem('yapti_tokens_anon_used') || '0', 10);
+        localStorage.setItem('yapti_tokens_anon_used', String(used + 1));
+    }
+
+    renderYaptiPlanStatus();
+    return true;
+}
+
+// --- "Agregar Local" en Ciudades Creativas ---
+async function handleAddLocalClick() {
+    const user = await getAuthenticatedUser();
+    if (!user) {
+        showToast('Inicia sesión para agregar tu local.', 'error');
+        navigateTo('/registro');
+        return;
+    }
+
+    const state = await getUserPlanState();
+    if (!state.hasPlan) {
+        openPlanModal('local');
+        return;
+    }
+
+    const modal = document.getElementById('add-local-modal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    modal.classList.remove('hidden');
+}
+
+function closeAddLocalModal() {
+    const modal = document.getElementById('add-local-modal');
+    if (!modal) return;
+    modal.style.display = 'none';
+    modal.classList.add('hidden');
+}
+
+async function handleAddLocalSubmit(event) {
+    event.preventDefault();
+    const user = await getAuthenticatedUser();
+    if (!user) {
+        showToast('Inicia sesión para agregar tu local.', 'error');
+        return;
+    }
+
+    const nombre = document.getElementById('local-nombre')?.value.trim();
+    const ciudad = document.getElementById('local-ciudad')?.value;
+    const categoria = document.getElementById('local-categoria')?.value;
+    const descripcion = document.getElementById('local-descripcion')?.value.trim();
+
+    if (!nombre || !ciudad || !descripcion) {
+        showToast('Completa todos los campos.', 'error');
+        return;
+    }
+
+    const btn = event.target.querySelector('button[type="submit"]');
+    const textoOriginal = btn.innerText;
+    btn.disabled = true;
+    btn.innerText = 'Guardando...';
+
+    const { error } = await supabaseClient.from('locales_negocio').insert({
+        user_id: user.id,
+        nombre,
+        ciudad,
+        categoria,
+        descripcion
+    });
+
+    btn.disabled = false;
+    btn.innerText = textoOriginal;
+
+    if (error) {
+        console.error(error);
+        showToast('No se pudo guardar tu local. Intenta de nuevo.', 'error');
+        return;
+    }
+
+    showToast('¡Tu local ya está publicado en Ciudades Creativas!');
+    event.target.reset();
+    closeAddLocalModal();
+    filterCreativeSites();
+}
+
+
 
 async function handleRegister(event) {
     event.preventDefault();
@@ -856,11 +1119,14 @@ function setQuickQuestion(text) {
 }
 function handleChatKey(e) { if (e.key === 'Enter') sendUserMessage(); }
 
-function sendUserMessage() {
+async function sendUserMessage() {
     const input = document.getElementById('chat-input');
     if (!input) return;
     const text = input.value.trim();
     if (!text) return;
+
+    const allowed = await consumeYaptiToken();
+    if (!allowed) return;
 
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) return;

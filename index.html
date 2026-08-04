@@ -331,6 +331,9 @@
                     <div class="title-header">
                         <h1 id="sites-title">Ciudades Creativas</h1>
                         <p id="sites-subtitle">Explora la riqueza cultural, artesanal y natural de nuestros municipios destacados</p>
+                        <button type="button" class="btn-add-local" onclick="handleAddLocalClick()">
+                            <i data-lucide="store"></i> Agregar Local
+                        </button>
                     </div>
                     
                     <div class="creative-controls">
@@ -390,6 +393,7 @@
                         </div>
                         <h1 style="font-size: 2.5rem; color: var(--primary); font-weight: 900;">Asistente Virtual YAPTI</h1>
                         <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: 0.5rem;">Tu consejero experto en rutas, gastronomía y cultura nicaragüense</p>
+                        <div id="yapti-tokens-badge" class="yapti-tokens-badge"></div>
                     </div>
 
                     <div class="quick-questions">
@@ -576,6 +580,82 @@
             </div>
 
             <button type="submit" class="btn-open-upload">PUBLICAR EN GALERÍA</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: necesita el Plan Viajero -->
+<div id="plan-modal" onclick="if(event.target.id==='plan-modal') closePlanModal()">
+    <div class="modal-content plan-modal-content">
+        <button class="btn-close-modal" onclick="closePlanModal()">×</button>
+
+        <div class="plan-badge"><i data-lucide="sparkles"></i> Plan Viajero</div>
+        <h2>Desbloqueá todo Dale Viaje</h2>
+        <p id="plan-modal-reason" class="plan-modal-reason"></p>
+
+        <ul class="plan-benefits">
+            <li><i data-lucide="check"></i> Preguntas ilimitadas a YAPTI</li>
+            <li><i data-lucide="check"></i> Agregá tu local a Ciudades Creativas</li>
+            <li><i data-lucide="check"></i> Tu negocio visible para todos los viajeros</li>
+        </ul>
+
+        <div class="plan-price">C$300<span>/mes</span></div>
+
+        <button type="button" id="plan-buy-btn" class="btn-buy-plan" onclick="purchasePlanSimulated()">
+            Comprar Plan Viajero
+        </button>
+        <p class="plan-disclaimer">Pago simulado para esta demo — no se realiza ningún cobro real.</p>
+    </div>
+</div>
+
+<!-- Modal: agregar local (requiere Plan Viajero) -->
+<div id="add-local-modal" onclick="if(event.target.id==='add-local-modal') closeAddLocalModal()">
+    <div class="modal-content">
+        <button class="btn-close-modal" onclick="closeAddLocalModal()">×</button>
+
+        <h2>Agregar mi Local</h2>
+
+        <form onsubmit="handleAddLocalSubmit(event)">
+            <div class="input-group">
+                <label>Nombre del Local</label>
+                <div class="input-wrapper">
+                    <i data-lucide="store"></i>
+                    <input type="text" id="local-nombre" required placeholder="Ej. Artesanías Doña Chepa">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label>Ciudad</label>
+                <select id="local-ciudad" required>
+                    <option value="Estelí">Estelí</option>
+                    <option value="León">León</option>
+                    <option value="Nagarote">Nagarote</option>
+                    <option value="Managua">Managua</option>
+                    <option value="Masaya">Masaya</option>
+                    <option value="Granada">Granada</option>
+                    <option value="San Juan de Oriente">San Juan de Oriente</option>
+                    <option value="Juigalpa">Juigalpa</option>
+                    <option value="Matagalpa">Matagalpa</option>
+                    <option value="Bluefields">Bluefields</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Categoría</label>
+                <select id="local-categoria" required>
+                    <option value="artesania">Artesanía</option>
+                    <option value="turistico">Turístico</option>
+                    <option value="colonial">Colonial</option>
+                    <option value="historico">Histórico</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Descripción</label>
+                <textarea id="local-descripcion" class="custom-textarea" rows="3" required placeholder="Contanos qué ofrece tu local..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-open-upload">PUBLICAR LOCAL</button>
         </form>
     </div>
 </div>
