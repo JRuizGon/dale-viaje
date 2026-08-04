@@ -271,9 +271,9 @@ p {
     transition: opacity 0.5s ease-in-out;
 }
 
-/* ==========================================================================
+/*
    ESTRUCTURA DE NAVEGACIÓN Y NAVBAR (CORREGIDA)
-   ========================================================================== */
+ */
 .navbar {
     background-color: var(--bg-dark-card);
     border: 20px var(--celeste);
@@ -502,9 +502,9 @@ main {
     margin-top: 0.25rem;
 }
 
-/* ==========================================================================
+/*
    VISTA: HOME (INICIO) - BANNER PERSONALIZADO
-   ========================================================================== */
+ */
 .hero {
     padding: 10rem 2rem;
     text-align: center;
@@ -638,9 +638,9 @@ main {
     color: #cbd5e1;
 }
 
-/* ==========================================================================
+/*
    VISTA: MAPA INTERACTIVO
-   ========================================================================== */
+ */
 
    .map-interactive-wrapper {
     position: relative;
@@ -2609,9 +2609,9 @@ padding-top: 80px;
     }
 }
 
-/* ========================================================================== 
+/* 
    INICIO: RUTAS PINOLERAS
-   ========================================================================== */
+ */
 .home-showcase {
     max-width: 1510px;
     margin: 0 auto;
@@ -2754,6 +2754,13 @@ padding-top: 80px;
         radial-gradient(circle at 84% 15%, rgba(0, 174, 239, 0.22), transparent 30%),
         linear-gradient(135deg, #062e79, #031a55);
     border-radius: 0 0 2rem 2rem;
+}
+
+/* Evita que el contenido interno (p.ej. la lista de destinos, que tiene
+   un ancho mínimo por tarjeta) fuerce a la columna del grid a crecer más
+   allá del ancho disponible en pantallas angostas. */
+.home-discover > * {
+    min-width: 0;
 }
 
 .home-why h2,
@@ -2955,7 +2962,7 @@ padding-top: 80px;
   }
 }
 
-/* ===== DISEÑO MODERNO: PÁGINAS DE CIUDADES ===== */
+/*  DISEÑO MODERNO: PÁGINAS DE CIUDADES  */
 
 .ciudades-style {
   width: min(1180px, calc(100% - 2rem));
@@ -3114,11 +3121,7 @@ padding-top: 80px;
     height: 260px !important;
   }
 }
-/* ==========================================================================
-   REDISEÑO DE PÁGINAS DE CIUDAD (ciudades.html)
-   Clases nuevas y aisladas — no tocan el CSS viejo de .ciudades-style
-   para no romper nada que ya funcionaba.
-   ========================================================================== */
+/*  REDISEÑO DE PÁGINAS DE CIUDAD */
 
 .city-hero {
     position: relative;
