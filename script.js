@@ -369,7 +369,7 @@ function navigateTo(viewId) {
 
     if(viewId === '/galeria') renderGallery();
     if(viewId === '/ciudades-creativas') filterCreativeSites();
-    if(viewId === '/ia-guia') renderYaptiPlanStatus();
+    if(viewId === '/ia-guia') { renderYaptiPlanStatus(); loadYaptiHistory(); }
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
@@ -591,9 +591,9 @@ async function toggleSave(btn, id) {
 
 function closeModalOnOverlay(e) { if (e.target.id === 'upload-modal') closeModal(); }
 
-/* ==========================================================================
+/*==
     NUEVO DISPARADOR CENTRALIZADO DE SESIÓN (SOLUCIONA TU BUG DE NAVEGACIÓN)
-   ========================================================================== */
+== */
 function checkSession() {
     const session = localStorage.getItem('viajero_session');
     const formsContainer = document.getElementById('auth-forms-container');
@@ -634,7 +634,7 @@ function checkSession() {
     }
 }
 
-/* ==========================================================================
+/*==
     PLAN DE PAGO (SIMULADO), TOKENS DE YAPTI Y "AGREGAR LOCAL"
     ------------------------------------------------------------------------
     IMPORTANTE: Esta app no tiene conectada una pasarela de pago real
@@ -644,7 +644,7 @@ function checkSession() {
     tengas un proveedor de pagos real, esa es la única función que hay que
     reemplazar por la llamada de checkout real + un webhook que confirme el
     pago antes de poner has_plan en true.
-   ========================================================================== */
+== */
 
 const YAPTI_FREE_TOKENS = 5; // Preguntas gratis para quien no tiene el plan
 
@@ -733,7 +733,8 @@ async function purchasePlanSimulated() {
     showToast('¡Listo! Tu Plan Viajero está activo.');
     closePlanModal();
 
-    // Refrescar cualquier parte de la interfaz que dependa del plan
+    // Refrescar la sesión local (localStorage) y toda la interfaz que dependa del plan
+    await syncSessionFromSupabase();
     renderYaptiPlanStatus();
     if (document.getElementById('view-sites')?.classList.contains('active')) {
         filterCreativeSites();
@@ -973,6 +974,8 @@ function actualizarCajaPerfilInterfaz(user) {
     const editUserInp = document.getElementById('edit-username');
     const editCityInp = document.getElementById('edit-city');
     const avatarImg = document.getElementById('profile-avatar-img');
+    const planStatusEl = document.getElementById('val-plan-status');
+    const btnCancelPlan = document.getElementById('btn-cancel-plan');
     
     if (user) {
         if (usernameEl) usernameEl.innerText = `@${user.username}`;
@@ -985,11 +988,52 @@ function actualizarCajaPerfilInterfaz(user) {
                 ? user.avatar 
                 : "https://api.dicebear.com/7.x/bottts/svg?seed=" + user.username;
         }
+
+        if (planStatusEl) {
+            planStatusEl.innerText = user.hasPlan ? 'Activo ✓' : 'Sin plan activo';
+            planStatusEl.classList.toggle('plan-status-active', Boolean(user.hasPlan));
+        }
+        if (btnCancelPlan) {
+            btnCancelPlan.style.display = user.hasPlan ? 'inline-flex' : 'none';
+        }
     }
 }
-/* ==========================================================================
+
+async function cancelPlanSubscription() {
+    if (!confirm('¿Seguro que querés dar de baja el Plan Viajero? Perderás las preguntas ilimitadas a YAPTI y ya no podrás agregar nuevos locales.')) return;
+
+    const user = await getAuthenticatedUser();
+    if (!user) {
+        showToast('Inicia sesión primero.', 'error');
+        return;
+    }
+
+    const btn = document.getElementById('btn-cancel-plan');
+    const textoOriginal = btn ? btn.innerText : '';
+    if (btn) { btn.disabled = true; btn.innerText = 'Procesando...'; }
+
+    const { error } = await supabaseClient
+        .from('profiles')
+        .update({ has_plan: false })
+        .eq('id', user.id);
+
+    if (btn) { btn.disabled = false; btn.innerText = textoOriginal; }
+
+    if (error) {
+        console.error(error);
+        showToast('No se pudo dar de baja el plan. Intenta de nuevo.', 'error');
+        return;
+    }
+
+    // Refrescar la sesión local (localStorage) y la interfaz
+    await syncSessionFromSupabase();
+    renderYaptiPlanStatus();
+    showToast('Diste de baja el Plan Viajero.');
+}
+
+/*==
     CAMBIO DINÁMICO Y PERSISTENCIA DEL AVATAR / LOGO DE PERFIL
-   ========================================================================== */
+== */
 
 function uploadAvatar() {
     const fileInput = document.getElementById('avatar-input');
@@ -1119,6 +1163,100 @@ function setQuickQuestion(text) {
 }
 function handleChatKey(e) { if (e.key === 'Enter') sendUserMessage(); }
 
+// --- Historial de YAPTI ---
+// Usuarios con sesión: se guarda en Supabase (tabla yapti_historial), persiste entre dispositivos.
+// Invitados: se guarda en este navegador (localStorage), se pierde si borran datos o cambian de equipo.
+
+function appendChatMessage(role, text) {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+
+    if (role === 'user') {
+        const userMsg = document.createElement('div');
+        userMsg.className = 'message user';
+        userMsg.innerText = text;
+        chatMessages.appendChild(userMsg);
+    } else {
+        const aiMsg = document.createElement('div');
+        aiMsg.className = 'message ai';
+        aiMsg.innerHTML = `
+            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
+            <div class="ai-body"></div>
+        `;
+        aiMsg.querySelector('.ai-body').innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+        chatMessages.appendChild(aiMsg);
+    }
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+async function saveYaptiMessage(role, text) {
+    const user = await getAuthenticatedUser();
+    if (user) {
+        const { error } = await supabaseClient.from('yapti_historial').insert({
+            user_id: user.id, role, content: text
+        });
+        if (error) console.error('No se pudo guardar el mensaje en el historial:', error);
+    } else {
+        const historial = JSON.parse(localStorage.getItem('yapti_chat_guest') || '[]');
+        historial.push({ role, content: text });
+        // Guardamos como máximo los últimos 50 mensajes para no llenar el navegador
+        localStorage.setItem('yapti_chat_guest', JSON.stringify(historial.slice(-50)));
+    }
+}
+
+async function loadYaptiHistory() {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+
+    const user = await getAuthenticatedUser();
+    let historial = [];
+
+    if (user) {
+        const { data, error } = await supabaseClient
+            .from('yapti_historial')
+            .select('role, content')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: true });
+        if (error) console.error('No se pudo cargar el historial de YAPTI:', error);
+        historial = data || [];
+    } else {
+        historial = JSON.parse(localStorage.getItem('yapti_chat_guest') || '[]');
+    }
+
+    if (historial.length === 0) return; // Se deja el saludo inicial que ya trae el HTML
+
+    chatMessages.innerHTML = '';
+    historial.forEach(msg => appendChatMessage(msg.role, msg.content));
+    if (window.lucide) lucide.createIcons();
+}
+
+async function clearYaptiHistory() {
+    if (!confirm('¿Borrar todo tu historial de conversación con YAPTI?')) return;
+
+    const user = await getAuthenticatedUser();
+    if (user) {
+        const { error } = await supabaseClient.from('yapti_historial').delete().eq('user_id', user.id);
+        if (error) {
+            console.error(error);
+            showToast('No se pudo borrar el historial.', 'error');
+            return;
+        }
+    } else {
+        localStorage.removeItem('yapti_chat_guest');
+    }
+
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) {
+        chatMessages.innerHTML = `
+            <div class="message ai">
+                <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
+                <div>¡Hola, caminante! Soy tu asistente de viaje experto en Nicaragua. Pregúntame sobre hoteles históricos, volcanes activos o dónde conseguir artesanías de barro. ¿Por dónde empezamos el viaje?</div>
+            </div>`;
+        if (window.lucide) lucide.createIcons();
+    }
+    showToast('Historial borrado.');
+}
+
 async function sendUserMessage() {
     const input = document.getElementById('chat-input');
     if (!input) return;
@@ -1131,30 +1269,19 @@ async function sendUserMessage() {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) return;
 
-    const userMsg = document.createElement('div');
-    userMsg.className = 'message user';
-    userMsg.innerText = text; 
-    chatMessages.appendChild(userMsg);
+    appendChatMessage('user', text);
+    saveYaptiMessage('user', text);
 
     input.value = '';
-    chatMessages.scrollTop = chatMessages.scrollHeight;
 
     setTimeout(() => {
         const normalizedText = text.toLowerCase();
         let aiText = aiResponses["default"];
         for (let key in aiResponses) { if (normalizedText.includes(key)) { aiText = aiResponses[key]; break; } }
 
-        const aiMsg = document.createElement('div');
-        aiMsg.className = 'message ai';
-        aiMsg.innerHTML = `
-            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
-            <div class="ai-body"></div>
-        `;
-        aiMsg.querySelector('.ai-body').innerHTML = aiText.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>'); 
-        
-        chatMessages.appendChild(aiMsg);
+        appendChatMessage('ai', aiText);
+        saveYaptiMessage('ai', aiText);
         if (window.lucide) lucide.createIcons();
-        chatMessages.scrollTop = chatMessages.scrollHeight;
     }, 600);
 }
 
@@ -1221,9 +1348,6 @@ document.querySelectorAll('.dept-trigger').forEach(dept => {
       }).addTo(leafletMapInstance);
     }
 
-    // Opcional: Añadir un marcador en el centro del departamento escogido
-    // Limpiamos marcadores anteriores si es necesario manejando un LayerGroup, 
-    // o simplemente dejamos un pin en el centro:
     L.marker([lat, lng]).addTo(leafletMapInstance)
       .bindPopup(`<b>Bienvenido a ${name}</b>`)
       .openPopup();
@@ -1242,9 +1366,8 @@ if (btnCerrarDetalle && seccionDetalle) {
 }
 }
 
-/* ========================================================================
-   SUPABASE — versiones finales sin servidor Node/Express
-   ======================================================================== */
+/*
+   SUPABASE*/
 async function renderGallery() {
     const container = document.getElementById('gallery-render-container');
     const client = requireSupabase();

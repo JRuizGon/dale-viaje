@@ -1678,6 +1678,58 @@ main {
     box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4);
 }
 
+/* Sistema genérico de botones usado en la caja de perfil
+   (Editar / Guardar / Dar de baja del Plan / Cerrar Sesión) */
+.btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn:disabled { opacity: 0.65; cursor: default; transform: none !important; }
+
+.btn-primary {
+    background: var(--celeste, #139DF0);
+    color: #fff;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(19, 157, 240, 0.4); }
+
+.btn-secondary {
+    background: var(--azul-oscuro);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.btn-secondary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
+
+.btn-danger {
+    background: rgba(230, 57, 70, 0.1);
+    color: var(--red);
+    border: 1px solid rgba(230, 57, 70, 0.25);
+}
+.btn-danger:hover {
+    background: var(--red);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4);
+}
+
+.profile-actions { flex-wrap: wrap; }
+
+/* Estado del Plan Viajero dentro de la caja de perfil */
+.profile-value.plan-status-active {
+    color: var(--amarillo, #FBBF24);
+    font-weight: 800;
+}
+
 .auth-box-layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -3589,3 +3641,28 @@ padding-top: 80px;
 @media (max-width: 640px) {
     .btn-add-local { width: 100%; justify-content: center; }
 }
+
+.btn-clear-history {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+    margin-left: 0.6rem;
+    padding: 0.5rem 0.9rem;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-weight: 700;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.btn-clear-history:hover {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.btn-clear-history svg { width: 0.95rem; height: 0.95rem; }

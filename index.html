@@ -394,6 +394,9 @@
                         <h1 style="font-size: 2.5rem; color: var(--primary); font-weight: 900;">Asistente Virtual YAPTI</h1>
                         <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: 0.5rem;">Tu consejero experto en rutas, gastronomía y cultura nicaragüense</p>
                         <div id="yapti-tokens-badge" class="yapti-tokens-badge"></div>
+                        <button type="button" class="btn-clear-history" onclick="clearYaptiHistory()">
+                            <i data-lucide="trash-2"></i> Borrar historial
+                        </button>
                     </div>
 
                     <div class="quick-questions">
@@ -508,6 +511,10 @@
                 <span class="profile-label">Ciudad Favorita</span>
                 <span id="val-city" class="profile-value">Granada</span>
             </div>
+            <div class="profile-row" style="margin-top: 1rem;">
+                <span class="profile-label">Plan Viajero</span>
+                <span id="val-plan-status" class="profile-value">Sin plan activo</span>
+            </div>
         </div>
 
         <!-- Modo Edición -->
@@ -527,6 +534,7 @@
     <div class="profile-actions">
         <button id="btn-edit" class="btn btn-secondary" onclick="toggleEdit()">Editar Perfil</button>
         <button id="btn-save" class="btn btn-primary" style="display: none;" onclick="saveProfile()">Guardar Cambios</button>
+        <button id="btn-cancel-plan" class="btn btn-danger" style="display: none;" onclick="cancelPlanSubscription()">Dar de baja el Plan</button>
         <button class="btn btn-danger" onclick="handleLogout()">Cerrar Sesión</button>
     </div>
 </div>
@@ -599,7 +607,7 @@
             <li><i data-lucide="check"></i> Tu negocio visible para todos los viajeros</li>
         </ul>
 
-        <div class="plan-price">20$<span>/mes</span></div>
+        <div class="plan-price">C$300<span>/mes</span></div>
 
         <button type="button" id="plan-buy-btn" class="btn-buy-plan" onclick="purchasePlanSimulated()">
             Comprar Plan Viajero
