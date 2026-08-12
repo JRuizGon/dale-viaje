@@ -385,48 +385,96 @@
 
             <!-- Yapti (IA) -->
 
-            <div id="view-ia" class="view ia-bg">
-                <div class="ia-container">
-                    <div class="text-center" style="text-align: center; margin-bottom: 2.5rem;">
-                        <div class="ia-header-icon">
-                            <i data-lucide="bot" style="width: 2.2rem; height: 2.2rem;"></i>
-                        </div>
-                        <h1 style="font-size: 2.5rem; color: var(--primary); font-weight: 900;">Asistente Virtual YAPTI</h1>
-                        <p style="color: var(--text-muted); font-size: 1.1rem; margin-top: 0.5rem;">Tu consejero experto en rutas, gastronomía y cultura nicaragüense</p>
-                        <div id="yapti-tokens-badge" class="yapti-tokens-badge"></div>
-                        <button type="button" class="btn-clear-history" onclick="clearYaptiHistory()">
-                            <i data-lucide="trash-2"></i> Borrar historial
-                        </button>
-                    </div>
+            <div id="view-ia" class="view yapti-view">
+                <div class="yapti-shell">
 
-                    <div class="quick-questions">
-                        <button class="btn-quick" onclick="setQuickQuestion('¿Qué comer en Granada?')">
-                            <i data-lucide="utensils" style="color: var(--amber);"></i> ¿Qué comer en Granada?
+                    <aside class="yapti-sidebar">
+                        <button type="button" class="yapti-new-chat-btn" onclick="startNewYaptiChat()">
+                            <i data-lucide="square-pen"></i> Nuevo Chat
                         </button>
-                        <button class="btn-quick" onclick="setQuickQuestion('¿Cómo subir al volcán Cerro Negro?')">
-                            <i data-lucide="mountain" style="color: var(--primary);"></i> ¿Cómo subir al volcán Cerro Negro?
-                        </button>
-                        <button class="btn-quick" onclick="setQuickQuestion('¿Dónde hacen las mejores artesanías de barro?')">
-                            <i data-lucide="palette" style="color: var(--success);"></i> ¿Dónde hacen artesanías de barro?
-                        </button>
-                        <button class="btn-quick" onclick="setQuickQuestion('¿Cuál es la mejor época para visitar Corn Island?')">
-                            <i data-lucide="sun" style="color: var(--red);"></i> Mejor época para Corn Island
-                        </button>
-                    </div>
 
-                    <div class="chat-box">
-                        <div class="chat-messages" id="chat-messages">
-                            <div class="message ai">
-                                <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
-                                <div>¡Hola, caminante! Soy tu asistente de viaje experto en Nicaragua. Pregúntame sobre hoteles históricos, volcanes activos o dónde conseguir artesanías de barro. ¿Por dónde empezamos el viaje?</div>
-                            </div>
-                        </div>
-                        <div class="chat-input-area">
-                            <input type="text" id="chat-input" class="chat-input" placeholder="Escribe tu pregunta aquí..." onkeypress="handleChatKey(event)">
-                            <button class="btn-send" onclick="sendUserMessage()">
-                                <i data-lucide="send" style="width: 1.2rem; height: 1.2rem;"></i>
+                        <div class="yapti-sidebar-section">
+                            <span class="yapti-sidebar-label">Preguntas rápidas</span>
+                            <button class="yapti-sidebar-item" onclick="setQuickQuestion('¿Qué comer en Granada?')">
+                                <i data-lucide="utensils"></i> ¿Qué comer en Granada?
+                            </button>
+                            <button class="yapti-sidebar-item" onclick="setQuickQuestion('¿Cómo subir al volcán Cerro Negro?')">
+                                <i data-lucide="mountain"></i> Subir al Cerro Negro
+                            </button>
+                            <button class="yapti-sidebar-item" onclick="setQuickQuestion('¿Dónde hacen las mejores artesanías de barro?')">
+                                <i data-lucide="palette"></i> Artesanías de barro
+                            </button>
+                            <button class="yapti-sidebar-item" onclick="setQuickQuestion('¿Cuál es la mejor época para visitar Corn Island?')">
+                                <i data-lucide="sun"></i> Mejor época Corn Island
                             </button>
                         </div>
+
+                        <div class="yapti-sidebar-section yapti-sidebar-recent">
+                            <span class="yapti-sidebar-label">Recientes</span>
+                            <div id="yapti-recent-list" class="yapti-recent-list"></div>
+                            <button type="button" class="yapti-clear-all-link" onclick="clearYaptiHistory()">
+                                <i data-lucide="trash-2"></i> Borrar todo el historial
+                            </button>
+                        </div>
+
+                        <div class="yapti-sidebar-footer">
+                            <div id="yapti-tokens-badge" class="yapti-tokens-badge"></div>
+                            <div class="yapti-sidebar-profile">
+                                <img id="yapti-sidebar-avatar" class="yapti-sidebar-avatar" src="" alt="Avatar" style="display:none;">
+                                <div id="yapti-sidebar-avatar-fallback" class="yapti-sidebar-avatar yapti-sidebar-avatar-fallback">
+                                    <i data-lucide="user"></i>
+                                </div>
+                                <div class="yapti-sidebar-profile-info">
+                                    <span id="yapti-sidebar-username">Invitado</span>
+                                    <span id="yapti-sidebar-plan">Gratis</span>
+                                </div>
+                                <button type="button" id="yapti-upgrade-btn" class="yapti-upgrade-btn" onclick="openPlanModal('yapti')">Mejorar</button>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <main class="yapti-main" id="yapti-main">
+                        <div class="yapti-topbar">
+                            <button type="button" class="yapti-sidebar-toggle" onclick="toggleYaptiSidebar()">
+                                <i data-lucide="menu"></i>
+                            </button>
+                            <div class="ia-header-icon"><i data-lucide="bot"></i></div>
+                            <div class="yapti-topbar-text">
+                                <h1>Asistente Virtual YAPTI</h1>
+                                <p>Tu consejero experto en rutas, gastronomía y cultura nicaragüense</p>
+                            </div>
+                        </div>
+
+                        <div class="yapti-empty-state" id="yapti-empty-state">
+                            <div class="ia-header-icon big"><i data-lucide="bot"></i></div>
+                            <h2>¿A dónde vamos hoy?</h2>
+                            <p>Preguntame sobre rutas, comida típica, hospedaje o cultura nicaragüense.</p>
+                        </div>
+
+                        <div class="chat-messages" id="chat-messages"></div>
+
+                        <div class="yapti-input-dock">
+                            <div class="chat-input-area">
+                                <input type="text" id="chat-input" class="chat-input" placeholder="Pregunta lo que quieras..." onkeypress="handleChatKey(event)">
+                                <button class="btn-send" onclick="sendUserMessage()">
+                                    <i data-lucide="send" style="width: 1.2rem; height: 1.2rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </main>
+
+                </div>
+            </div>
+
+            <div id="view-email-verified" class="view">
+                <div class="verified-shell">
+                    <div class="verified-card">
+                        <div class="verified-icon"><i data-lucide="badge-check"></i></div>
+                        <h1>Correo verificado</h1>
+                        <p>Correo verificado, ya puedes navegar en nuestras rutas creativas.</p>
+                        <button type="button" class="btn-buy-plan" onclick="navigateTo('/ciudades-creativas')">
+                            Ir a Ciudades Creativas
+                        </button>
                     </div>
                 </div>
             </div>

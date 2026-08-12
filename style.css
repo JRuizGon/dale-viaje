@@ -3666,3 +3666,364 @@ padding-top: 80px;
 }
 
 .btn-clear-history svg { width: 0.95rem; height: 0.95rem; }
+
+/* ==========================================================================
+   YAPTI — REDISEÑO CON SIDEBAR (estilo ChatGPT/Claude)
+   ========================================================================== */
+
+.yapti-view { padding: 0; }
+
+.yapti-shell {
+    display: flex;
+    min-height: calc(100vh - 4.75rem);
+    background: #0b1130;
+}
+
+/* --- Sidebar --- */
+.yapti-sidebar {
+    width: 280px;
+    flex-shrink: 0;
+    background: #0a0e27;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    padding: 1.1rem 0.9rem;
+    gap: 1.3rem;
+}
+
+.yapti-new-chat-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.75rem 0.9rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+.yapti-new-chat-btn:hover { background: rgba(255, 255, 255, 0.12); }
+.yapti-new-chat-btn svg { width: 1.05rem; height: 1.05rem; }
+
+.yapti-sidebar-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.yapti-sidebar-recent {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.yapti-sidebar-label {
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #64748b;
+    padding: 0.4rem 0.6rem 0.2rem;
+}
+
+.yapti-sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    font-size: 0.83rem;
+    font-weight: 600;
+    padding: 0.55rem 0.6rem;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.yapti-sidebar-item:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+.yapti-sidebar-item.active { background: rgba(19, 157, 240, 0.18); color: #fff; }
+.yapti-sidebar-item svg { width: 0.95rem; height: 0.95rem; flex-shrink: 0; color: var(--amarillo); }
+
+.yapti-recent-list { display: flex; flex-direction: column; gap: 0.15rem; }
+.yapti-recent-empty {
+    display: block;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.78rem;
+    color: #475569;
+}
+
+.yapti-clear-all-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.6rem;
+    margin-top: 0.3rem;
+    cursor: pointer;
+    border-radius: 8px;
+}
+.yapti-clear-all-link:hover { color: var(--red); background: rgba(230, 57, 70, 0.08); }
+.yapti-clear-all-link svg { width: 0.85rem; height: 0.85rem; }
+
+/* --- Perfil al pie del sidebar --- */
+.yapti-sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.yapti-sidebar-profile {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem;
+}
+
+.yapti-sidebar-avatar {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.yapti-sidebar-avatar-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    color: #94a3b8;
+}
+.yapti-sidebar-avatar-fallback svg { width: 1.1rem; height: 1.1rem; }
+
+.yapti-sidebar-profile-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+}
+.yapti-sidebar-profile-info span:first-child {
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.yapti-sidebar-profile-info span:last-child {
+    color: #64748b;
+    font-size: 0.72rem;
+}
+
+.yapti-upgrade-btn {
+    flex-shrink: 0;
+    background: var(--amarillo, #FBBF24);
+    color: #201400;
+    border: none;
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+/* --- Columna principal --- */
+.yapti-main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.yapti-topbar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.3rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.yapti-topbar .ia-header-icon { margin-bottom: 0; width: 3rem; height: 3rem; }
+.yapti-topbar-text h1 { font-size: 1.3rem; font-weight: 900; color: #fff; }
+.yapti-topbar-text p { font-size: 0.85rem; color: #94a3b8; margin-top: 0.15rem; }
+
+#yapti-tokens-badge.yapti-tokens-badge {
+    margin-top: 0;
+    margin-left: auto;
+}
+
+.yapti-empty-state {
+    flex: 1;
+    display: none; /* JS lo pone en flex cuando no hay mensajes */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 2rem;
+}
+.yapti-empty-state .ia-header-icon.big { width: 4rem; height: 4rem; margin-bottom: 0.5rem; }
+.yapti-empty-state h2 { color: #fff; font-size: 1.6rem; font-weight: 900; }
+.yapti-empty-state p { color: #94a3b8; font-size: 0.95rem; max-width: 420px; }
+
+.yapti-main .chat-messages {
+    display: none; /* JS lo pone en flex cuando hay mensajes */
+    flex: 1;
+    background: transparent;
+    padding: 1.5rem 2rem;
+    max-width: 780px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.yapti-input-dock {
+    padding: 1rem 2rem 1.5rem;
+    background: linear-gradient(180deg, transparent, #0b1130 40%);
+}
+
+.yapti-input-dock .chat-input-area {
+    max-width: 780px;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 999px;
+    padding: 0.5rem 0.5rem 0.5rem 1.3rem;
+}
+
+.chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+.chat-input::placeholder { color: #64748b; }
+
+.btn-send {
+    flex-shrink: 0;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    border: none;
+    background: var(--celeste, #139DF0);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s ease;
+}
+.btn-send:hover { transform: scale(1.06); }
+
+.ai-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--amarillo, #FBBF24);
+    margin-bottom: 0.4rem;
+}
+
+/* Botón "menú" del sidebar, solo visible en móvil */
+.yapti-sidebar-toggle {
+    display: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #fff;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 10px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .yapti-sidebar-toggle { display: flex; }
+
+    .yapti-sidebar {
+        position: fixed;
+        top: 0; bottom: 0; left: 0;
+        z-index: 1200;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+    }
+    .yapti-shell.sidebar-open .yapti-sidebar { transform: translateX(0); }
+
+    .yapti-shell::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+    }
+    .yapti-shell.sidebar-open::before { opacity: 1; pointer-events: auto; }
+
+    .yapti-topbar { padding: 1rem 1.1rem; }
+    .yapti-main .chat-messages { padding: 1rem 1.1rem; }
+    .yapti-input-dock { padding: 0.75rem 1.1rem 1.1rem; }
+    #yapti-tokens-badge.yapti-tokens-badge { display: none; }
+}
+
+/* ==========================================================================
+   PÁGINA DE CORREO VERIFICADO
+   ========================================================================== */
+
+.verified-shell {
+    min-height: calc(100vh - 4.75rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: radial-gradient(circle at 50% 20%, rgba(19, 157, 240, 0.12), transparent 40%), #0b1130;
+}
+
+.verified-card {
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+}
+
+.verified-icon {
+    width: 4.5rem;
+    height: 4.5rem;
+    margin: 0 auto 1.25rem;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.verified-icon svg { width: 2.3rem; height: 2.3rem; }
+
+.verified-card h1 { color: #fff; font-size: 1.8rem; font-weight: 900; margin-bottom: 0.75rem; }
+.verified-card p { color: #94a3b8; font-size: 1rem; margin-bottom: 1.75rem; line-height: 1.6; }

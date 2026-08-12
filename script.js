@@ -305,6 +305,7 @@ function navigateTo(viewId) {
         '/ciudades-creativas': 'view-sites',
         '/galeria': 'view-gallery',
         '/ia-guia': 'view-ia',
+        '/correo-verificado': 'view-email-verified',
         '/registro': 'view-auth',
         '/esteli': 'view-esteli',
         '/leon': 'view-leon',
@@ -369,7 +370,7 @@ function navigateTo(viewId) {
 
     if(viewId === '/galeria') renderGallery();
     if(viewId === '/ciudades-creativas') filterCreativeSites();
-    if(viewId === '/ia-guia') { renderYaptiPlanStatus(); loadYaptiHistory(); }
+    if(viewId === '/ia-guia') initYaptiView();
     if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
@@ -591,9 +592,9 @@ async function toggleSave(btn, id) {
 
 function closeModalOnOverlay(e) { if (e.target.id === 'upload-modal') closeModal(); }
 
-/*==
+/* ==========================================================================
     NUEVO DISPARADOR CENTRALIZADO DE SESIÓN (SOLUCIONA TU BUG DE NAVEGACIÓN)
-== */
+   ========================================================================== */
 function checkSession() {
     const session = localStorage.getItem('viajero_session');
     const formsContainer = document.getElementById('auth-forms-container');
@@ -634,7 +635,7 @@ function checkSession() {
     }
 }
 
-/*==
+/* ==========================================================================
     PLAN DE PAGO (SIMULADO), TOKENS DE YAPTI Y "AGREGAR LOCAL"
     ------------------------------------------------------------------------
     IMPORTANTE: Esta app no tiene conectada una pasarela de pago real
@@ -644,7 +645,7 @@ function checkSession() {
     tengas un proveedor de pagos real, esa es la única función que hay que
     reemplazar por la llamada de checkout real + un webhook que confirme el
     pago antes de poner has_plan en true.
-== */
+   ========================================================================== */
 
 const YAPTI_FREE_TOKENS = 5; // Preguntas gratis para quien no tiene el plan
 
@@ -1031,9 +1032,9 @@ async function cancelPlanSubscription() {
     showToast('Diste de baja el Plan Viajero.');
 }
 
-/*==
+/* ==========================================================================
     CAMBIO DINÁMICO Y PERSISTENCIA DEL AVATAR / LOGO DE PERFIL
-== */
+   ========================================================================== */
 
 function uploadAvatar() {
     const fileInput = document.getElementById('avatar-input');
@@ -1153,19 +1154,32 @@ async function saveProfile() {
     }
 }
 
-/* --- GUÍA VIRTUAL DE IA --- */
-function setQuickQuestion(text) { 
-    const chatInput = document.getElementById('chat-input');
-    if(chatInput) {
-        chatInput.value = text; 
-        sendUserMessage(); 
+function toggleYaptiSidebar() {
+    document.querySelector('.yapti-shell')?.classList.toggle('sidebar-open');
+}
+function closeYaptiSidebarOnMobile() {
+    if (window.innerWidth <= 900) {
+        document.querySelector('.yapti-shell')?.classList.remove('sidebar-open');
     }
 }
-function handleChatKey(e) { if (e.key === 'Enter') sendUserMessage(); }
 
-// --- Historial de YAPTI ---
-// Usuarios con sesión: se guarda en Supabase (tabla yapti_historial), persiste entre dispositivos.
+/* --- GUÍA VIRTUAL DE IA (YAPTI) --- */
+// Cada "Nuevo Chat" es una conversation_id distinta, igual que en ChatGPT/Claude.
+// Usuarios con sesión: todo se guarda en Supabase (tabla yapti_historial), persiste entre dispositivos.
 // Invitados: se guarda en este navegador (localStorage), se pierde si borran datos o cambian de equipo.
+
+let currentYaptiConversationId = sessionStorage.getItem('yapti_conversation_id') || crypto.randomUUID();
+sessionStorage.setItem('yapti_conversation_id', currentYaptiConversationId);
+
+function setQuickQuestion(text) {
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+        chatInput.value = text;
+        sendUserMessage();
+    }
+    closeYaptiSidebarOnMobile();
+}
+function handleChatKey(e) { if (e.key === 'Enter') sendUserMessage(); }
 
 function appendChatMessage(role, text) {
     const chatMessages = document.getElementById('chat-messages');
@@ -1180,7 +1194,7 @@ function appendChatMessage(role, text) {
         const aiMsg = document.createElement('div');
         aiMsg.className = 'message ai';
         aiMsg.innerHTML = `
-            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
+            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> Guía IA Pinolero</div>
             <div class="ai-body"></div>
         `;
         aiMsg.querySelector('.ai-body').innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
@@ -1189,49 +1203,119 @@ function appendChatMessage(role, text) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
+// Muestra el saludo centrado (sin mensajes) o la conversación con el input abajo.
+function setYaptiLayoutState(hasMessages) {
+    const empty = document.getElementById('yapti-empty-state');
+    const messages = document.getElementById('chat-messages');
+    const main = document.getElementById('yapti-main');
+    if (!empty || !messages || !main) return;
+    empty.style.display = hasMessages ? 'none' : 'flex';
+    messages.style.display = hasMessages ? 'flex' : 'none';
+    main.classList.toggle('has-messages', hasMessages);
+}
+
 async function saveYaptiMessage(role, text) {
     const user = await getAuthenticatedUser();
     if (user) {
         const { error } = await supabaseClient.from('yapti_historial').insert({
-            user_id: user.id, role, content: text
+            user_id: user.id, role, content: text, conversation_id: currentYaptiConversationId
         });
         if (error) console.error('No se pudo guardar el mensaje en el historial:', error);
     } else {
         const historial = JSON.parse(localStorage.getItem('yapti_chat_guest') || '[]');
-        historial.push({ role, content: text });
-        // Guardamos como máximo los últimos 50 mensajes para no llenar el navegador
-        localStorage.setItem('yapti_chat_guest', JSON.stringify(historial.slice(-50)));
+        historial.push({ role, content: text, conversation_id: currentYaptiConversationId, created_at: new Date().toISOString() });
+        // Guardamos como máximo los últimos 200 mensajes para no llenar el navegador
+        localStorage.setItem('yapti_chat_guest', JSON.stringify(historial.slice(-200)));
     }
 }
 
-async function loadYaptiHistory() {
-    const chatMessages = document.getElementById('chat-messages');
-    if (!chatMessages) return;
-
+async function getYaptiAllMessages() {
     const user = await getAuthenticatedUser();
-    let historial = [];
-
     if (user) {
         const { data, error } = await supabaseClient
             .from('yapti_historial')
-            .select('role, content')
+            .select('role, content, conversation_id, created_at')
             .eq('user_id', user.id)
             .order('created_at', { ascending: true });
-        if (error) console.error('No se pudo cargar el historial de YAPTI:', error);
-        historial = data || [];
-    } else {
-        historial = JSON.parse(localStorage.getItem('yapti_chat_guest') || '[]');
+        if (error) { console.error('No se pudo cargar el historial de YAPTI:', error); return []; }
+        return data || [];
     }
+    return JSON.parse(localStorage.getItem('yapti_chat_guest') || '[]');
+}
 
-    if (historial.length === 0) return; // Se deja el saludo inicial que ya trae el HTML
+// Dibuja SOLO los mensajes de la conversación actualmente abierta.
+async function renderCurrentYaptiConversation() {
+    const chatMessages = document.getElementById('chat-messages');
+    if (!chatMessages) return;
+
+    const todos = await getYaptiAllMessages();
+    const delChat = todos.filter(m => m.conversation_id === currentYaptiConversationId);
 
     chatMessages.innerHTML = '';
-    historial.forEach(msg => appendChatMessage(msg.role, msg.content));
+    delChat.forEach(msg => appendChatMessage(msg.role, msg.content));
+    setYaptiLayoutState(delChat.length > 0);
     if (window.lucide) lucide.createIcons();
 }
 
+// Arma la lista "Recientes" del sidebar agrupando por conversation_id.
+async function loadYaptiConversationsList() {
+    const list = document.getElementById('yapti-recent-list');
+    if (!list) return;
+
+    const todos = await getYaptiAllMessages();
+    const conversaciones = new Map();
+
+    todos.forEach(m => {
+        if (!conversaciones.has(m.conversation_id)) {
+            conversaciones.set(m.conversation_id, { id: m.conversation_id, titulo: null, ultima: m.created_at });
+        }
+        const c = conversaciones.get(m.conversation_id);
+        if (!c.titulo && m.role === 'user') c.titulo = m.content;
+        c.ultima = m.created_at;
+    });
+
+    const items = Array.from(conversaciones.values())
+        .filter(c => c.titulo) // solo conversaciones con al menos una pregunta
+        .sort((a, b) => (a.ultima < b.ultima ? 1 : -1))
+        .slice(0, 15);
+
+    list.innerHTML = '';
+    if (items.length === 0) {
+        list.innerHTML = `<span class="yapti-recent-empty">Todavía no hay conversaciones</span>`;
+        return;
+    }
+
+    items.forEach(c => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'yapti-sidebar-item yapti-recent-item' + (c.id === currentYaptiConversationId ? ' active' : '');
+        btn.textContent = c.titulo.length > 34 ? c.titulo.slice(0, 34) + '…' : c.titulo;
+        btn.onclick = () => openYaptiConversation(c.id);
+        list.appendChild(btn);
+    });
+}
+
+async function openYaptiConversation(conversationId) {
+    currentYaptiConversationId = conversationId;
+    sessionStorage.setItem('yapti_conversation_id', conversationId);
+    await renderCurrentYaptiConversation();
+    await loadYaptiConversationsList();
+    document.getElementById('chat-input')?.focus();
+    closeYaptiSidebarOnMobile();
+}
+
+function startNewYaptiChat() {
+    currentYaptiConversationId = crypto.randomUUID();
+    sessionStorage.setItem('yapti_conversation_id', currentYaptiConversationId);
+    document.getElementById('chat-messages').innerHTML = '';
+    setYaptiLayoutState(false);
+    loadYaptiConversationsList();
+    document.getElementById('chat-input')?.focus();
+    closeYaptiSidebarOnMobile();
+}
+
 async function clearYaptiHistory() {
-    if (!confirm('¿Borrar todo tu historial de conversación con YAPTI?')) return;
+    if (!confirm('¿Borrar TODO tu historial de conversaciones con YAPTI? Esto no se puede deshacer.')) return;
 
     const user = await getAuthenticatedUser();
     if (user) {
@@ -1245,16 +1329,48 @@ async function clearYaptiHistory() {
         localStorage.removeItem('yapti_chat_guest');
     }
 
-    const chatMessages = document.getElementById('chat-messages');
-    if (chatMessages) {
-        chatMessages.innerHTML = `
-            <div class="message ai">
-                <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
-                <div>¡Hola, caminante! Soy tu asistente de viaje experto en Nicaragua. Pregúntame sobre hoteles históricos, volcanes activos o dónde conseguir artesanías de barro. ¿Por dónde empezamos el viaje?</div>
-            </div>`;
-        if (window.lucide) lucide.createIcons();
-    }
+    startNewYaptiChat();
     showToast('Historial borrado.');
+}
+
+// Muestra en el sidebar quién está usando YAPTI y su plan (reutiliza la sesión ya guardada).
+function renderYaptiSidebarProfile() {
+    const session = JSON.parse(localStorage.getItem('viajero_session') || 'null');
+    const nombre = document.getElementById('yapti-sidebar-username');
+    const planLabel = document.getElementById('yapti-sidebar-plan');
+    const upgradeBtn = document.getElementById('yapti-upgrade-btn');
+    const avatarImg = document.getElementById('yapti-sidebar-avatar');
+    const avatarFallback = document.getElementById('yapti-sidebar-avatar-fallback');
+    if (!nombre || !planLabel || !upgradeBtn) return;
+
+    if (session) {
+        nombre.textContent = '@' + session.username;
+        planLabel.textContent = session.hasPlan ? 'Plan Viajero' : 'Gratis';
+        upgradeBtn.style.display = session.hasPlan ? 'none' : 'inline-flex';
+        if (session.avatar) {
+            avatarImg.src = session.avatar;
+            avatarImg.style.display = 'block';
+            avatarFallback.style.display = 'none';
+        } else {
+            avatarImg.style.display = 'none';
+            avatarFallback.style.display = 'flex';
+        }
+    } else {
+        nombre.textContent = 'Invitado';
+        planLabel.textContent = 'Gratis';
+        upgradeBtn.style.display = 'inline-flex';
+        avatarImg.style.display = 'none';
+        avatarFallback.style.display = 'flex';
+    }
+    if (window.lucide) lucide.createIcons();
+}
+
+// Se llama una sola vez, cada vez que se entra a la vista de YAPTI.
+async function initYaptiView() {
+    renderYaptiPlanStatus();
+    renderYaptiSidebarProfile();
+    await renderCurrentYaptiConversation();
+    await loadYaptiConversationsList();
 }
 
 async function sendUserMessage() {
@@ -1269,9 +1385,9 @@ async function sendUserMessage() {
     const chatMessages = document.getElementById('chat-messages');
     if (!chatMessages) return;
 
+    setYaptiLayoutState(true);
     appendChatMessage('user', text);
     saveYaptiMessage('user', text);
-
     input.value = '';
 
     setTimeout(() => {
@@ -1281,8 +1397,18 @@ async function sendUserMessage() {
 
         appendChatMessage('ai', aiText);
         saveYaptiMessage('ai', aiText);
+        loadYaptiConversationsList(); // el título de "Recientes" ya tiene con qué armarse
         if (window.lucide) lucide.createIcons();
     }, 600);
+}
+
+// Detecta si el usuario llegó desde el enlace de confirmación de correo de Supabase
+// (funciona tanto con el flujo por hash como por query string).
+function checkEmailVerification() {
+    const hashParams = new URLSearchParams((window.location.hash || '').replace('#', '?'));
+    const queryParams = new URLSearchParams(window.location.search || '');
+    const type = hashParams.get('type') || queryParams.get('type');
+    return type === 'signup' || type === 'email_change';
 }
 
 window.onload = function() {
@@ -1297,11 +1423,17 @@ window.onload = function() {
 
     const splash = document.getElementById('splash-screen');
     const contenido = document.getElementById('main-content');
+    const vieneDeConfirmarCorreo = checkEmailVerification();
+
+    if (vieneDeConfirmarCorreo) {
+        // Limpiamos el token de la URL para que no quede visible ni se re-dispare al recargar
+        history.replaceState(null, '', window.location.pathname);
+    }
 
     if (splash) {
         setTimeout(() => {
             if (typeof navigateTo === 'function') {
-                navigateTo('/');
+                navigateTo(vieneDeConfirmarCorreo ? '/correo-verificado' : '/');
             }
             splash.style.opacity = '0';
             setTimeout(() => {
@@ -1311,7 +1443,7 @@ window.onload = function() {
                     contenido.style.opacity = '1';
                 }
             }, 500);
-        }, 5000);
+        }, vieneDeConfirmarCorreo ? 900 : 5000);
     }
     
     // Variable global para almacenar la instancia del mapa y evitar duplicados
@@ -1348,6 +1480,9 @@ document.querySelectorAll('.dept-trigger').forEach(dept => {
       }).addTo(leafletMapInstance);
     }
 
+    // Opcional: Añadir un marcador en el centro del departamento escogido
+    // Limpiamos marcadores anteriores si es necesario manejando un LayerGroup, 
+    // o simplemente dejamos un pin en el centro:
     L.marker([lat, lng]).addTo(leafletMapInstance)
       .bindPopup(`<b>Bienvenido a ${name}</b>`)
       .openPopup();
@@ -1366,8 +1501,9 @@ if (btnCerrarDetalle && seccionDetalle) {
 }
 }
 
-/*
-   SUPABASE*/
+/* ========================================================================
+   SUPABASE — versiones finales sin servidor Node/Express
+   ======================================================================== */
 async function renderGallery() {
     const container = document.getElementById('gallery-render-container');
     const client = requireSupabase();
