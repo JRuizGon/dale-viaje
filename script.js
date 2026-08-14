@@ -1164,9 +1164,7 @@ function closeYaptiSidebarOnMobile() {
 }
 
 /* --- GUÍA VIRTUAL DE IA (YAPTI) --- */
-// Cada "Nuevo Chat" es una conversation_id distinta, igual que en ChatGPT/Claude.
-// Usuarios con sesión: todo se guarda en Supabase (tabla yapti_historial), persiste entre dispositivos.
-// Invitados: se guarda en este navegador (localStorage), se pierde si borran datos o cambian de equipo.
+
 
 let currentYaptiConversationId = sessionStorage.getItem('yapti_conversation_id') || crypto.randomUUID();
 sessionStorage.setItem('yapti_conversation_id', currentYaptiConversationId);
