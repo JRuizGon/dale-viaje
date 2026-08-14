@@ -148,7 +148,7 @@ Como no hay una API REST propia, el "contrato de endpoints" son las operaciones 
 
 ### Pendientes de seguridad (no implementados todavía)
 
-- **Autenticación de dos factores (2FA)**: Supabase Auth soporta MFA por TOTP de forma nativa (`supabaseClient.auth.mfa`). Se puede agregar como una pantalla de "Activar verificación en dos pasos" en el perfil. *(Puedo implementarlo si querés que lo hagamos ahora.)*
+- **Autenticación de dos factores (2FA)**: Supabase Auth soporta MFA por TOTP de forma nativa (`supabaseClient.auth.mfa`). Se puede agregar como una pantalla de "Activar verificación en dos pasos" en el perfil. 
 - **Expiración de sesión explícita en la UI**: Supabase ya refresca el token automáticamente y lo expira del lado del servidor, pero falta un manejo explícito en pantalla (por ejemplo, redirigir a `/registro` con un aviso si `onAuthStateChange` reporta `SIGNED_OUT` por expiración, en vez de dejar botones que fallan en silencio).
 
 ## Control de versiones
