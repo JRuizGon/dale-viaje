@@ -1194,7 +1194,7 @@ function appendChatMessage(role, text) {
         const aiMsg = document.createElement('div');
         aiMsg.className = 'message ai';
         aiMsg.innerHTML = `
-            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> Guía IA Pinolero</div>
+            <div class="ai-badge"><i data-lucide="bot" style="width: 1rem; height: 1rem;"></i> YAPTI</div>
             <div class="ai-body"></div>
         `;
         aiMsg.querySelector('.ai-body').innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
