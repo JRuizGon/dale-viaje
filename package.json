@@ -1,11 +1,10 @@
 {
   "name": "dale-viaje",
   "version": "1.0.0",
-  "description": "**Dale Viaje** es una plataforma web interactiva diseñada para que viajeros compartan sus aventuras, fotos y descubrimientos de destinos turísticos. El proyecto cuenta con un sistema de autenticación de usuarios, una galería dinámica y persistencia de datos local para registrar cada experiencia.",
-  "main": "server.js",
+  "description": "Dale Viaje es una plataforma web interactiva diseñada para que viajeros compartan sus aventuras, fotos y descubrimientos de destinos turísticos. Sitio estático (sin backend propio) conectado a Supabase para autenticación, base de datos y almacenamiento.",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "npx serve ."
   },
   "repository": {
     "type": "git",
@@ -17,8 +16,5 @@
   "bugs": {
     "url": "https://github.com/JRuizGon/dale-viaje/issues"
   },
-  "homepage": "https://github.com/JRuizGon/dale-viaje#readme",
-  "dependencies": {
-    "multer": "^2.2.0"
-  }
+  "homepage": "https://github.com/JRuizGon/dale-viaje#readme"
 }
