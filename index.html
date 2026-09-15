@@ -96,7 +96,7 @@
 </nav>
 
   <a onclick="navigateTo('/')" class="nav-logo">
-            <img src="img/logo.png" alt="Logo KALI" class="logo-app-img"> 
+            <img src="img/logo.png" alt="Logo Dale Viaje" class="logo-app-img"> 
         </a>
 
   <a onclick="navigateTo('/registro')" class="nav-btn-account" id="link-auth">
@@ -111,6 +111,7 @@
             <div id="view-home" class="view active">
                 <main class="home-showcase">
                     <section class="home-hero">
+                        <img src="img/yapti/yapti_saludando.png" alt="" class="home-hero-mascot" aria-hidden="true">
                         <div class="home-hero-panel">
                             <span class="home-sun" aria-hidden="true">☀</span>
                             <h1>Rutas Pinoleras</h1>
@@ -389,6 +390,14 @@
                 <div class="yapti-shell">
 
                     <aside class="yapti-sidebar">
+                        <div class="yapti-sidebar-brand">
+                            <img src="img/yapti/yapti_senalando.png" alt="YAPTI">
+                            <div>
+                                <strong>YAPTI</strong>
+                                <span>el Zanate viajero</span>
+                            </div>
+                        </div>
+
                         <button type="button" class="yapti-new-chat-btn" onclick="startNewYaptiChat()">
                             <i data-lucide="square-pen"></i> Nuevo Chat
                         </button>
@@ -434,11 +443,12 @@
                     </aside>
 
                     <main class="yapti-main" id="yapti-main">
+                        <img src="img/yapti/yapti_explorando.png" alt="" class="yapti-bg-mascot" aria-hidden="true">
                         <div class="yapti-topbar">
                             <button type="button" class="yapti-sidebar-toggle" onclick="toggleYaptiSidebar()">
                                 <i data-lucide="menu"></i>
                             </button>
-                            <div class="ia-header-icon"><i data-lucide="bot"></i></div>
+                            <div class="ia-header-icon"><img src="img/yapti/yapti_mapa.png" alt="YAPTI"></div>
                             <div class="yapti-topbar-text">
                                 <h1>Asistente Virtual YAPTI</h1>
                                 <p>Tu consejero experto en rutas, gastronomía y cultura nicaragüense</p>
@@ -446,7 +456,7 @@
                         </div>
 
                         <div class="yapti-empty-state" id="yapti-empty-state">
-                            <div class="ia-header-icon big"><i data-lucide="bot"></i></div>
+                            <div class="ia-header-icon big"><img src="img/yapti/yapti_saludando.png" alt="YAPTI saludando"></div>
                             <h2>¿A dónde vamos hoy?</h2>
                             <p>Preguntame sobre rutas, comida típica, hospedaje o cultura nicaragüense.</p>
                         </div>
@@ -562,6 +572,10 @@
             <div class="profile-row" style="margin-top: 1rem;">
                 <span class="profile-label">Plan Viajero</span>
                 <span id="val-plan-status" class="profile-value">Sin plan activo</span>
+            </div>
+            <div class="profile-row" style="margin-top: 1rem;">
+                <span class="profile-label">Verificación en 2 pasos</span>
+                <span id="mfa-status-box" class="profile-mfa-box"></span>
             </div>
         </div>
 
@@ -713,6 +727,52 @@
 
             <button type="submit" class="btn-open-upload">PUBLICAR LOCAL</button>
         </form>
+    </div>
+</div>
+
+<!-- Modal: activar verificación en dos pasos -->
+<div id="mfa-enroll-modal" onclick="if(event.target.id==='mfa-enroll-modal') closeMfaEnrollModal()">
+    <div class="modal-content plan-modal-content">
+        <button class="btn-close-modal" onclick="closeMfaEnrollModal()">×</button>
+
+        <h2>Activar verificación en dos pasos</h2>
+        <p class="plan-modal-reason">Escaneá este código con Google Authenticator, Authy o cualquier app de códigos TOTP.</p>
+
+        <img id="mfa-qr-img" src="" alt="Código QR para activar 2FA" style="width: 180px; height: 180px; margin: 0 auto 1rem; display: block; border-radius: 12px; background: #fff; padding: 8px;">
+
+        <p class="plan-modal-reason">¿No podés escanear? Ingresá este código manualmente:</p>
+        <code id="mfa-secret-text" style="display: block; text-align: center; word-break: break-all; margin-bottom: 1.25rem; color: var(--amarillo);"></code>
+
+        <form onsubmit="confirmarActivacionMfa(event)">
+            <div class="input-group">
+                <label>Código de 6 dígitos</label>
+                <div class="input-wrapper">
+                    <i data-lucide="shield-check"></i>
+                    <input type="text" id="mfa-enroll-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123456">
+                </div>
+            </div>
+            <button type="submit" class="btn-buy-plan">Confirmar y activar</button>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: pedir código de 2FA al iniciar sesión -->
+<div id="mfa-challenge-modal">
+    <div class="modal-content plan-modal-content">
+        <h2>Verificación en dos pasos</h2>
+        <p class="plan-modal-reason">Ingresá el código de 6 dígitos de tu app de autenticación para completar el inicio de sesión.</p>
+
+        <form onsubmit="verificarMfaChallenge(event)">
+            <div class="input-group">
+                <label>Código de 6 dígitos</label>
+                <div class="input-wrapper">
+                    <i data-lucide="shield-check"></i>
+                    <input type="text" id="mfa-challenge-code" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" required placeholder="123456">
+                </div>
+            </div>
+            <button type="submit" class="btn-buy-plan">Verificar e ingresar</button>
+        </form>
+        <button type="button" class="yapti-clear-all-link" style="margin: 1rem auto 0;" onclick="closeMfaChallenge()">Cancelar</button>
     </div>
 </div>
     <script src="supabase-config.js"></script>

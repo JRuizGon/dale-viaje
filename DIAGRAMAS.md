@@ -117,6 +117,7 @@ flowchart LR
         UC10(["Agregar Local propio"])
         UC11(["Dar de baja el Plan"])
         UC12(["Ver historial de conversaciones"])
+        UC13(["Activar/desactivar verificación en dos pasos"])
     end
 
     Visitante --> UC1
@@ -131,6 +132,7 @@ flowchart LR
     Viajero --> UC8
     Viajero --> UC9
     Viajero --> UC12
+    Viajero --> UC13
 
     ViajeroPlan --> UC10
     ViajeroPlan --> UC11

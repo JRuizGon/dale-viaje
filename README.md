@@ -137,6 +137,34 @@ Como no hay una API REST propia, el "contrato de endpoints" son las operaciones 
 | Comprar/cancelar plan | `UPDATE profiles SET has_plan` | `purchasePlanSimulated()` / `cancelPlanSubscription()` |
 | Agregar local | `INSERT` en `locales_negocio` (solo si `has_plan = true`, forzado por RLS) | `handleAddLocalSubmit()` |
 | Chatear con YAPTI | `INSERT`/`SELECT` en `yapti_historial` | `sendUserMessage()`, `saveYaptiMessage()` |
+| YAPTI con IA real | `supabaseClient.functions.invoke('yapti-ai', ...)` | `sendUserMessage()` → Edge Function `yapti-ai` |
+| Activar / verificar / desactivar 2FA | `supabaseClient.auth.mfa.enroll() / challenge() / verify() / unenroll()` | `iniciarActivacionMfa()`, `confirmarActivacionMfa()`, `verificarMfaChallenge()`, `desactivarMfa()` |
+
+## YAPTI: asistente con IA real
+
+YAPTI dejó de ser un sistema de palabras clave: ahora llama a una **Supabase Edge Function** (`supabase/functions/yapti-ai`) que usa la API de Claude (Anthropic) para responder, usando como contexto real los datos de las tablas `sitios_creativos` y `locales_negocio` (nunca inventa lugares que no estén en la base de datos).
+
+- La clave de la API de Anthropic vive **solo** como secreto de la función en Supabase — nunca en el navegador.
+- Si la función no está desplegada o falla (por ejemplo, todavía no configuraste la clave), YAPTI cae automáticamente al sistema de respuestas por palabra clave (`aiResponses` en `script.js`), para que el chat nunca se sienta roto.
+
+### Cómo desplegarla
+
+Necesitás la [CLI de Supabase](https://supabase.com/docs/guides/cli) instalada y estar logueado (`supabase login`):
+
+```bash
+# 1) Conectar la CLI a tu proyecto
+supabase link --project-ref TU-PROJECT-REF
+
+# 2) Configurar la clave de Anthropic como secreto (nunca en el código)
+supabase secrets set ANTHROPIC_API_KEY=sk-ant-tu-clave-aqui
+
+# 3) Desplegar la función
+supabase functions deploy yapti-ai
+```
+
+Conseguí tu clave de Anthropic en [console.anthropic.com](https://console.anthropic.com/) → API Keys. **Es un servicio pago** (cobra por uso/tokens); revisá los precios antes de anunciar el lanzamiento.
+
+> Nota de seguridad: el `CORS_HEADERS` de la función usa `Access-Control-Allow-Origin: *` para facilitar las pruebas. Antes de producción, cambialo en `index.ts` por el dominio real de tu sitio.
 
 ## Seguridad y buenas prácticas
 
@@ -146,9 +174,10 @@ Como no hay una API REST propia, el "contrato de endpoints" son las operaciones 
 - **Manejo de errores**: todas las llamadas a Supabase están envueltas en `try/catch` o revisan `{ data, error }`, y los errores se muestran al usuario con notificaciones (toasts) en vez de fallar en silencio o mostrar errores técnicos.
 - **Claves**: solo la clave pública (`publishable`/`anon`) vive en el código; la `service_role key` nunca se usa en el navegador.
 
+- **Autenticación de dos factores (2FA)**: implementada con Supabase Auth MFA (TOTP). Desde el perfil ("Mi Cuenta"), cualquier usuario puede activarla escaneando un código QR con Google Authenticator/Authy y confirmando un código de 6 dígitos. Una vez activada, el siguiente inicio de sesión exige ese código antes de abrir la sesión (`getAuthenticatorAssuranceLevel()` detecta si falta el segundo factor y bloquea el acceso hasta verificarlo). Se puede desactivar en cualquier momento desde el mismo lugar.
+
 ### Pendientes de seguridad (no implementados todavía)
 
-- **Autenticación de dos factores (2FA)**: Supabase Auth soporta MFA por TOTP de forma nativa (`supabaseClient.auth.mfa`). Se puede agregar como una pantalla de "Activar verificación en dos pasos" en el perfil. 
 - **Expiración de sesión explícita en la UI**: Supabase ya refresca el token automáticamente y lo expira del lado del servidor, pero falta un manejo explícito en pantalla (por ejemplo, redirigir a `/registro` con un aviso si `onAuthStateChange` reporta `SIGNED_OUT` por expiración, en vez de dejar botones que fallan en silencio).
 
 ## Control de versiones
