@@ -2699,8 +2699,8 @@ padding-top: 80px;
     position: relative;
     overflow: hidden;
     background:
-        linear-gradient(90deg, rgba(3, 25, 65, 0.16), rgba(3, 25, 65, 0.02)),
-        url('img/banner-nicaragua.jpg') center / cover;
+        linear-gradient(90deg, rgba(3, 25, 65, 0.08), rgba(3, 25, 65, 0.02)),
+        url('img/hero/hero-scene.jpg') center / cover;
     border-radius: 0 0 2rem 2rem;
 }
 
@@ -2810,7 +2810,7 @@ padding-top: 80px;
 }
 
 .home-benefit strong { font-size: 0.95rem; color: var(--azul-oscuro); }
-.home-benefit span { font-family: 0.75rem; color: var(--amarillo);}
+.home-benefit span { font-size: 0.75rem; color: var(--gris-oscuro, #64748b); }
 .home-benefit-blue > svg { color: #087eea; background: #e6f2ff; }
 .home-benefit-green > svg { color: #10a53d; background: #e5f9e9; }
 .home-benefit-purple > svg { color: #4a43df; background: #ebebff; }
@@ -4164,13 +4164,16 @@ padding-top: 80px;
     font-weight: 700;
 }
 
-/* Yapti saludando desde el fondo del hero de inicio */
+/* La niña de traje típico da la bienvenida desde el hero de inicio;
+   YAPTI ya viene ilustrado sobre el pedestal dentro de la propia
+   imagen de fondo (img/hero/hero-scene.jpg), así que no hace falta
+   superponer otro mascota aparte. */
 .home-hero { position: relative; overflow: hidden; }
-.home-hero-mascot {
+.home-hero-character {
     position: absolute;
-    right: 1.5%;
+    left: 1%;
     bottom: 0;
-    width: clamp(140px, 20vw, 260px);
+    width: clamp(150px, 20vw, 280px);
     z-index: 1;
     filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.35));
     pointer-events: none;
@@ -4184,6 +4187,372 @@ padding-top: 80px;
 }
 
 @media (max-width: 900px) {
-    .home-hero-mascot { display: none; } /* en celular el hero ya está cargado de contenido */
+    .home-hero-character { display: none; } /* en celular el hero ya está cargado de contenido */
     .yapti-bg-mascot { width: 140px; opacity: 0.08; }
+}
+/* ============================================================
+   YAPTI EL ZANATE — MASCOTA OFICIAL DE DALE VIAJE
+   Identidad visual más vistosa, caricaturesca y cálida:
+   YAPTI acompaña cada sección (no solo el asistente de IA)
+   y queda disponible como botón flotante en toda la app.
+   ============================================================ */
+
+:root {
+    --zanate-negro: #1c1c22;
+    --zanate-teal: #1fc9c4;
+    --zanate-teal-oscuro: #0e9490;
+    --zanate-amber: #ffb020;
+    --zanate-crema: #fff8e6;
+    --radio-caricatura: 1.6rem;
+}
+
+/* --- Ícono de YAPTI dentro del menú de navegación --- */
+.menu-link-yapti { display: inline-flex; align-items: center; gap: 0.4rem; }
+.menu-link-yapti-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+    transition: transform 0.25s ease;
+}
+.menu-link-yapti:hover .menu-link-yapti-icon { transform: rotate(-12deg) scale(1.15); }
+
+/* --- Mascota de sección: aparece en los encabezados de cada vista --- */
+.section-mascot {
+    width: clamp(72px, 9vw, 108px);
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 16px rgba(0,0,0,0.28));
+    animation: zanateFloatSuave 3.6s ease-in-out infinite;
+    pointer-events: none;
+}
+.title-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.title-header .section-mascot {
+    position: absolute;
+    right: clamp(-0.5rem, 2vw, 1.5rem);
+    top: -0.75rem;
+}
+.section-mascot-inline {
+    position: static !important;
+    margin-right: 0.5rem;
+}
+.section-mascot-center {
+    position: static !important;
+    margin: 0 auto 0.75rem;
+    display: block;
+}
+.section-mascot-big { width: clamp(120px, 16vw, 190px); }
+
+@keyframes zanateFloatSuave {
+    0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+    50% { transform: translateY(-9px) rotate(1.5deg); }
+}
+
+@media (max-width: 720px) {
+    .title-header .section-mascot { position: static; margin-bottom: 0.5rem; }
+}
+
+/* --- Botón flotante de YAPTI: la mascota siempre a mano, en toda la app --- */
+.yapti-fab {
+    position: fixed;
+    right: clamp(1rem, 3vw, 2rem);
+    bottom: clamp(1rem, 3vw, 2rem);
+    z-index: 1200;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    border: 3px solid var(--zanate-crema);
+    background: radial-gradient(circle at 35% 30%, var(--zanate-teal), var(--zanate-teal-oscuro));
+    box-shadow: 0 12px 24px rgba(0,0,0,0.32), 0 0 0 6px rgba(31,201,196,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    overflow: visible;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s ease, opacity 0.25s ease, visibility 0.25s ease;
+    animation: zanateFabPulso 2.6s ease-in-out infinite;
+}
+.yapti-fab img {
+    width: 62px;
+    height: 62px;
+    object-fit: contain;
+    filter: drop-shadow(0 3px 4px rgba(0,0,0,0.3));
+    pointer-events: none;
+}
+.yapti-fab:hover {
+    transform: scale(1.1) rotate(-6deg);
+    box-shadow: 0 16px 30px rgba(0,0,0,0.38), 0 0 0 8px rgba(31,201,196,0.24);
+}
+.yapti-fab-bubble {
+    position: absolute;
+    right: 84px;
+    bottom: 12px;
+    background: var(--blanco);
+    color: var(--zanate-negro);
+    font-weight: 800;
+    font-size: 0.78rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 1rem 1rem 0.2rem 1rem;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(8px) scale(0.9);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+}
+.yapti-fab:hover .yapti-fab-bubble,
+.yapti-fab:focus-visible .yapti-fab-bubble {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+}
+.yapti-fab-hidden {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.6) translateY(20px);
+    pointer-events: none;
+}
+
+@keyframes zanateFabPulso {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-7px); }
+}
+
+@media (max-width: 720px) {
+    .yapti-fab { width: 60px; height: 60px; }
+    .yapti-fab img { width: 50px; height: 50px; }
+    .yapti-fab-bubble { display: none; }
+}
+
+/* --- Toque caricaturesco extra en botones clave: más rebote, más color --- */
+.home-primary-button,
+.home-map-button,
+.btn-auth,
+.btn-auth-secondary,
+.btn-buy-plan,
+.btn-open-upload,
+.btn-add-local {
+    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s ease, filter 0.22s ease !important;
+}
+.home-primary-button:hover,
+.home-map-button:hover,
+.btn-auth:hover,
+.btn-auth-secondary:hover,
+.btn-buy-plan:hover,
+.btn-open-upload:hover,
+.btn-add-local:hover {
+    transform: translateY(-3px) scale(1.035) !important;
+    filter: brightness(1.05);
+}
+.home-primary-button:active,
+.btn-auth:active,
+.btn-auth-secondary:active {
+    transform: translateY(0) scale(0.97) !important;
+}
+
+/* ============================================================
+   REDISEÑO ESTILO "RUTAS PINOLERAS" — navbar en píldora,
+   título cómic con contorno, tarjetas de destino con pin,
+   y botón "ver todos". Inspirado en el mockup enviado.
+   (El fondo ilustrado pintado a mano del mockup no se incluye:
+   no hay una herramienta de generación de imágenes disponible
+   en este entorno para crear esa pieza de arte original).
+   ============================================================ */
+
+/* --- Navbar como píldora flotante en pantallas grandes --- */
+@media (min-width: 900px) {
+    .navbar {
+        margin: 1.6rem auto 0;
+        max-width: 1360px;
+        border-radius: 999px;
+        border: none;
+        box-shadow: 0 14px 30px rgba(1, 15, 46, 0.22);
+        padding-top: 1.1rem;
+        -webkit-mask-image: url('img/nube-navbar.png');
+        mask-image: url('img/nube-navbar.png');
+        -webkit-mask-size: 100% 100%;
+        mask-size: 100% 100%;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+    }
+    .nav-container { gap: 1rem; }
+    .nav-logo { order: 1; }
+    .menu-nav { order: 2; flex: 1; display: flex; justify-content: center; }
+    .nav-btn-account { order: 3; }
+    .menu-icon { display: none; }
+    .menu-nav::before { display: none; content: none; }
+    .menu-links {
+        position: static;
+        transform: none;
+        flex-direction: row;
+        align-items: center;
+        width: auto;
+        height: auto;
+        margin: 0;
+        padding: 0;
+        font-size: 0.95rem;
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        box-shadow: none;
+        gap: 0.15rem;
+    }
+    .menu-links li { border-bottom: none; }
+    .menu-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.6rem 0.95rem;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+    .menu-link svg { width: 1.05rem; height: 1.05rem; }
+    .menu-link:hover {
+        background: rgba(19, 157, 240, 0.12);
+        color: var(--celeste-oscuro);
+    }
+}
+
+/* --- Botón de registro como píldora sólida --- */
+.nav-btn-account {
+    background: linear-gradient(135deg, var(--celeste), var(--celeste-oscuro)) !important;
+    color: var(--blanco) !important;
+    border: none !important;
+    border-radius: 999px !important;
+    padding: 0.6rem 1.3rem !important;
+    box-shadow: 0 8px 18px rgba(19, 157, 240, 0.35);
+    font-weight: 800;
+    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s ease;
+}
+.nav-btn-account:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 12px 22px rgba(19, 157, 240, 0.45);
+}
+
+/* --- Título "cómic" del hero: contorno grueso + relleno ámbar --- */
+.home-hero-panel {
+    border-radius: 2rem 3rem 2rem 3rem;
+    padding: 3.4rem 4rem;
+    -webkit-mask-image: url('img/nube-panel.png');
+    mask-image: url('img/nube-panel.png');
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+.home-hero-panel .home-hero-title {
+    font-family: 'Baloo 2', cursive;
+    font-weight: 800;
+    margin: 0;
+    font-size: clamp(2.6rem, 6vw, 4.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    color: var(--zanate-amber);
+    text-shadow:
+        -3px -3px 0 #fff, 3px -3px 0 #fff, -3px 3px 0 #fff, 3px 3px 0 #fff,
+        -3px 0 0 #fff, 3px 0 0 #fff, 0 -3px 0 #fff, 0 3px 0 #fff,
+        0 12px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* --- Encabezado "Destinos populares" + botón ver todos --- */
+.home-destinations-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+.home-see-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--zanate-amber);
+    color: var(--zanate-negro);
+    font-weight: 800;
+    font-size: 0.82rem;
+    border: 0;
+    border-radius: 999px;
+    padding: 0.55rem 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.18);
+    transition: transform 0.22s cubic-bezier(.34,1.56,.64,1), box-shadow 0.22s ease;
+    white-space: nowrap;
+}
+.home-see-all-btn:hover { transform: translateY(-2px) scale(1.04); }
+.home-see-all-btn svg { width: 1rem; height: 1rem; }
+
+/* --- Tarjetas de destino: pin flotante en vez de barra de degradado --- */
+.home-destination-card::after { content: none; }
+.home-destination-card span {
+    left: 0.55rem;
+    right: auto;
+    bottom: 0.55rem;
+    width: max-content;
+    max-width: calc(100% - 1.1rem);
+    background: var(--blanco);
+    color: var(--azul-oscuro);
+    padding: 0.4rem 0.75rem 0.4rem 0.55rem;
+    border-radius: 999px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.28);
+    font-size: 0.8rem;
+}
+.home-destination-card span svg { color: var(--red); width: 0.95rem; height: 0.95rem; }
+
+/* ============================================================
+   AJUSTES FINALES PARA MÓVIL — las nubes y el panel del hero
+   quedan reservados para tablet/escritorio, donde hay espacio
+   de sobra; en celular se simplifican para no recortar texto
+   ni desbordar la pantalla.
+   ============================================================ */
+@media (max-width: 900px) {
+    .home-hero-panel {
+        -webkit-mask-image: none;
+        mask-image: none;
+        padding: 2.7rem 1.25rem 1.75rem;
+        border-radius: 1.3rem;
+    }
+    .nav-btn-account {
+        padding: 0.45rem 0.7rem !important;
+        font-size: 0.75rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-hero-panel .home-hero-title { font-size: clamp(2.1rem, 11vw, 2.8rem); }
+    .home-hero-panel { padding: 2.3rem 1rem 1.5rem; }
+    .home-see-all-btn { font-size: 0.75rem; padding: 0.5rem 0.85rem; }
+    .home-destinations-heading h2 { font-size: 1.3rem; }
+    .yapti-fab-bubble { display: none; }
+}
+
+/* ============================================================
+   EL HERO SE EXTIENDE HASTA ARRIBA DE TODO, DETRÁS DEL NAVBAR
+   Así la nube del navbar flota directamente sobre la foto (como
+   en el mockup) y no se ve la textura azul de fondo del body
+   asomando por arriba ni en los huecos entre las nubes.
+   ============================================================ */
+.home-showcase { padding-top: 0; }
+
+@media (min-width: 900px) {
+    .home-hero {
+        margin-top: -7.6rem;
+        padding-top: 7.6rem;
+        min-height: calc(495px + 7.6rem);
+    }
+}
+
+@media (max-width: 899px) {
+    .home-hero {
+        margin-top: -1rem; /* compensa el padding-top:1rem de <main> */
+    }
 }

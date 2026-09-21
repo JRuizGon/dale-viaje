@@ -172,35 +172,16 @@ function showToast(message, type = 'success') {
     toast.querySelector('.toast-close').addEventListener('click', dismiss);
 }
 
-function navigateTo(viewId) {
-    document.querySelectorAll('.view').forEach(v => {
-        v.classList.remove('active');
-        v.style.display = 'none';
-    });
-
-    const idMap = {
-        '/': 'view-home',
-        '/mapa-interactivo': 'view-map',
-        '/ciudades-creativas': 'view-sites',
-        '/galeria': 'view-gallery',
-        '/ia-guia': 'view-ia',
-        '/correo-verificado': 'view-email-verified',
-        '/registro': 'view-auth',
-        '/esteli': 'view-esteli',
-        '/leon': 'view-leon',
-        '/nagarote': 'view-nagarote',
-        '/managua': 'view-managua',
-        '/masaya': 'view-masaya',
-        '/granada': 'view-granada',
-        '/sanjuan': 'view-sanjuan',
-        '/juigalpa': 'view-juigalpa',
-        '/matagalpa': 'view-matagalpa',
-        '/bluefields': 'view-bluefields'
-        
-    };
-    
+// NOTA: la configuración de la navbar (ocultar al hacer scroll, cerrar el menú
+// hamburguesa al navegar, etc.) se hacía antes DENTRO de navigateTo(), lo que
+// registraba listeners nuevos cada vez que el usuario cambiaba de vista y los
+// iba acumulando sin límite. Se movió a initNavbarBehavior(), que solo corre
+// una vez, para evitar ese bug de listeners duplicados.
+function initNavbarBehavior() {
   const navbar = document.querySelector('.navbar');
   const menuToggle = document.querySelector('#menu-toggle');
+  if (!navbar || !menuToggle) return;
+
   let ultimoScroll = window.scrollY;
 
   window.addEventListener('scroll', () => {
@@ -233,11 +214,40 @@ function navigateTo(viewId) {
     }
   });
 
-     document.querySelectorAll('.menu-link').forEach((link) => {
-  link.addEventListener('click', () => {
-    document.querySelector('#menu-toggle').checked = false;
+  document.querySelectorAll('.menu-link').forEach((link) => {
+    link.addEventListener('click', () => {
+      menuToggle.checked = false;
+    });
   });
-});
+}
+document.addEventListener('DOMContentLoaded', initNavbarBehavior);
+
+function navigateTo(viewId) {
+    document.querySelectorAll('.view').forEach(v => {
+        v.classList.remove('active');
+        v.style.display = 'none';
+    });
+
+    const idMap = {
+        '/': 'view-home',
+        '/mapa-interactivo': 'view-map',
+        '/ciudades-creativas': 'view-sites',
+        '/galeria': 'view-gallery',
+        '/ia-guia': 'view-ia',
+        '/correo-verificado': 'view-email-verified',
+        '/registro': 'view-auth',
+        '/esteli': 'view-esteli',
+        '/leon': 'view-leon',
+        '/nagarote': 'view-nagarote',
+        '/managua': 'view-managua',
+        '/masaya': 'view-masaya',
+        '/granada': 'view-granada',
+        '/sanjuan': 'view-sanjuan',
+        '/juigalpa': 'view-juigalpa',
+        '/matagalpa': 'view-matagalpa',
+        '/bluefields': 'view-bluefields'
+        
+    };
 
     const targetId = idMap[viewId] || 'view-404';
     const targetElement = document.getElementById(targetId);
@@ -245,6 +255,13 @@ function navigateTo(viewId) {
     if (targetElement) {
         targetElement.style.display = 'block';
         targetElement.classList.add('active');
+    }
+
+    // El botón flotante de YAPTI acompaña al viajero en toda la app; solo se
+    // oculta dentro de la propia sección de YAPTI, donde ya está presente.
+    const yaptiFab = document.getElementById('yapti-fab');
+    if (yaptiFab) {
+        yaptiFab.classList.toggle('yapti-fab-hidden', viewId === '/ia-guia');
     }
 
     if(viewId === '/galeria') renderGallery();

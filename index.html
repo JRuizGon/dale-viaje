@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DALE VIAJE</title>
-    <!-- Nueva Tipografía Elegante: Poppins -->
-    <link href = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!--Tipografía Caricaturesca-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <!-- CDN de Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="style.css">
@@ -85,11 +87,11 @@
   
   <!-- Enlaces del menú -->
   <ul class="menu-links">
-  <li><a onclick="navigateTo('/')" class="menu-link">Inicio</a></li>
-  <li><a onclick="navigateTo('/mapa-interactivo')" class="menu-link">Mapa</a></li>
-  <li><a onclick="navigateTo('/ciudades-creativas')" class="menu-link">Ciudades Creativas</a></li>
-  <li><a onclick="navigateTo('/galeria')" class="menu-link">Galería</a></li>
-  <li><a onclick="navigateTo('/ia-guia')" class="menu-link">YAPTI</a></li>
+  <li><a onclick="navigateTo('/')" class="menu-link"><i data-lucide="home"></i> Inicio</a></li>
+  <li><a onclick="navigateTo('/mapa-interactivo')" class="menu-link"><i data-lucide="map-pin"></i> Mapa</a></li>
+  <li><a onclick="navigateTo('/ciudades-creativas')" class="menu-link"><i data-lucide="camera"></i> Ciudades Creativas</a></li>
+  <li><a onclick="navigateTo('/galeria')" class="menu-link"><i data-lucide="image"></i> Galería</a></li>
+  <li><a onclick="navigateTo('/ia-guia')" class="menu-link menu-link-yapti"><img src="img/yapti/yapti_frontal.png" alt="" class="menu-link-yapti-icon" aria-hidden="true"> YAPTI</a></li>
   
 </ul>
 
@@ -105,16 +107,22 @@
   </a>
 </div>
 </nav>
-      
+
+<!-- YAPTI: mascota oficial flotante, visible en toda la app excepto en su propia sección -->
+<button type="button" id="yapti-fab" class="yapti-fab" onclick="navigateTo('/ia-guia')" aria-label="Preguntarle a YAPTI">
+    <span class="yapti-fab-bubble">¡Preguntame algo!</span>
+    <img src="img/yapti/yapti_saludando.png" alt="YAPTI, mascota de Dale Viaje">
+</button>
+
 <!-- Menu de Inicio -->
 
             <div id="view-home" class="view active">
                 <main class="home-showcase">
                     <section class="home-hero">
-                        <img src="img/yapti/yapti_saludando.png" alt="" class="home-hero-mascot" aria-hidden="true">
+                        <img src="img/hero/hero-girl.png" alt="" class="home-hero-character" aria-hidden="true">
                         <div class="home-hero-panel">
                             <span class="home-sun" aria-hidden="true">☀</span>
-                            <h1>Rutas Pinoleras</h1>
+                            <h1 class="home-hero-title">Rutas<br>Pinoleras</h1>
                             <p>Descubrí la magia, cultura y tradiciones de nuestras Ciudades Creativas.</p>
                             <button class="home-primary-button" onclick="navigateTo('/mapa-interactivo')">
                                 <i data-lucide="footprints"></i> Iniciar recorrido
@@ -137,7 +145,10 @@
                             <span><i data-lucide="sun"></i> Cada ruta, una historia que contar.</span>
                         </div>
                         <div class="home-destinations">
-                            <div class="home-destinations-heading"><h2>Destinos populares</h2><span></span></div>
+                            <div class="home-destinations-heading">
+                                <h2>Destinos populares</h2>
+                                <button type="button" class="home-see-all-btn" onclick="navigateTo('/mapa-interactivo')">Ver todos los destinos <i data-lucide="arrow-right"></i></button>
+                            </div>
                             <div class="home-destination-list">
                                 <button class="home-destination-card" onclick="window.open('ciudades.html?ciudad=granada', '_blank')"><img src="img/granada/IMG-20260625-WA0046.jpg" alt="Granada"><span><i data-lucide="map-pin"></i> Granada</span></button>
                                 <button class="home-destination-card" onclick="window.open('ciudades.html?ciudad=masaya', '_blank')"><img src="img/masaya/FB_IMG_1782971136132.jpg" alt="Masaya"><span><i data-lucide="map-pin"></i> Masaya</span></button>
@@ -153,9 +164,10 @@
 
             <!-- Seccion de Mapa -->
 
-            <div id="view-map" class="view active">
+            <div id="view-map" class="view">
                 <div class="container-content">
                     <div class="title-header">
+                        <img src="img/yapti/yapti_mapa.png" alt="YAPTI revisando el mapa" class="section-mascot" aria-hidden="true">
                         <h1>Exploración Geográfica</h1>
                         <p>Navega visualmente haciendo clic en las regiones del mapa para descubrir mas sobre ellas</p>
                     </div>
@@ -330,6 +342,7 @@
             <div id="view-sites" class="view">
                 <div class="container-content">
                     <div class="title-header">
+                        <img src="img/yapti/yapti_senalando.png" alt="YAPTI señalando una ciudad" class="section-mascot" aria-hidden="true">
                         <h1 id="sites-title">Ciudades Creativas</h1>
                         <p id="sites-subtitle">Explora la riqueza cultural, artesanal y natural de nuestros municipios destacados</p>
                         <button type="button" class="btn-add-local" onclick="handleAddLocalClick()">
@@ -372,6 +385,7 @@
             <div id="view-gallery" class="view">
                 <div class="container-content">
                     <div class="gallery-header-container">
+                        <img src="img/yapti/yapti_tomandofotos.png" alt="YAPTI tomando fotos" class="section-mascot section-mascot-inline" aria-hidden="true">
                         <div>
                             <h1>Galería Viajera</h1>
                             <p>Momentos capturados por exploradores en toda Nicaragua</p>
@@ -479,6 +493,7 @@
             <div id="view-email-verified" class="view">
                 <div class="verified-shell">
                     <div class="verified-card">
+                        <img src="img/yapti/yapti_celebrando.png" alt="YAPTI celebrando" class="section-mascot section-mascot-center" aria-hidden="true">
                         <div class="verified-icon"><i data-lucide="badge-check"></i></div>
                         <h1>Correo verificado</h1>
                         <p>Correo verificado, ya puedes navegar en nuestras rutas creativas.</p>
@@ -491,6 +506,7 @@
 
             <div id="view-auth" class="view">
                 <div class="container-content">
+                    <img src="img/yapti/yapti_frontal.png" alt="YAPTI te da la bienvenida" class="section-mascot section-mascot-center" aria-hidden="true">
                     <div id="auth-forms-container" class="auth-box-layout">
                         <div class="auth-card-panel border-left-blue">
                             <div class="auth-panel-header">
@@ -602,10 +618,10 @@
 </div>
             <div id="view-404" class="view">
                 <div class="error-container">
-                    <i data-lucide="alert-triangle" style="width: 4.5rem; height: 4.5rem; color: var(--red); margin-bottom: 1rem;"></i>
+                    <img src="img/yapti/yapti_explorando.png" alt="YAPTI buscando el camino" class="section-mascot section-mascot-center section-mascot-big" aria-hidden="true">
                     <h1>404</h1>
                     <h2>Ruta No Encontrada</h2>
-                    <p>Lo sentimos, caminante, el sitio al que intentas acceder no se encuentra mapeado.</p>
+                    <p>Lo sentimos, caminante, hasta YAPTI se perdió buscando esta página. El sitio al que intentas acceder no se encuentra mapeado.</p>
                     <a onclick="navigateTo('/')" class="btn-home">
                         <i data-lucide="arrow-left"></i> Volver al Inicio
                     </a>
